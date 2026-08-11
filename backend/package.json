@@ -3,12 +3,20 @@
   "module": "src/server.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "start": "bun run src/server.ts",
+    "build": "tsc --noEmit",
+    "format:write": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^8.2.3",
-    "@types/express": "^5.0.6"
+    "@types/express": "^5.0.6",
+    "prettier": "^3.9.6"
   },
   "peerDependencies": {
     "typescript": "^5"
