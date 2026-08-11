@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import { config } from "./config";
+import cors from "cors";
 
 const app = express();
 
@@ -9,7 +10,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// TODO: CORS
+// CORS
+app.use(
+  cors({
+    origin: config.frontendUrl,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cookie",
+      "stripe-signature",
+    ],
+  }),
+);
 
 // TODO: ROUTES
 app.get(config.apiVersionPrefix.concat("/health"), (req, res) => {
