@@ -8,7 +8,9 @@ export const config = {
   database: {
     url: process.env.DATABASE_URL || "mongodb://localhost:27017/headshotpro",
   },
-  apiVersionPrefix: "/api/v1",
+  apiVersionPrefix: {
+    v1: "/api/v1",
+  },
   frontendUrl:
     process.env.NODE_ENV === "production"
       ? process.env.FRONTEND_URL

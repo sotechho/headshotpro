@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { config } from "./config";
 import cors from "cors";
+import v1Routes from "./routes/v1";
 
 const app = express();
 
@@ -25,13 +26,15 @@ app.use(
 );
 
 // TODO: ROUTES
-app.get(config.apiVersionPrefix.concat("/health"), (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({
     message: "Server is running",
     status: "success",
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use(config.apiVersionPrefix.v1, v1Routes);
 
 // TODO: 404
 
