@@ -1,8 +1,8 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import { config } from "./config";
+import { config } from "@/config";
 import cors from "cors";
-import v1Routes from "./routes/v1";
+import v1Routes from "@/routes/v1";
 
 const app = express();
 
