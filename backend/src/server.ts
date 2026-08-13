@@ -1,24 +1,29 @@
-import app from "./app";
 import { config } from "@/config";
+import logger from "@/utils/logger";
+import app from "./app";
+import connectDB from "./database/connection";
 
 const startServer = () => {
   try {
     const server = app.listen(config.port, () =>
-      console.log(`Server is running on http://localhost:${config.port}`),
+      logger.info(`Server is running on http://localhost:${config.port}`),
     );
+
+    void connectDB();
 
     server.on("error", (error: NodeJS.ErrnoException) => {
       if (error.code === "EADDRINUSE") {
-        console.error(
+        logger.error(
           `Port ${config.port} is already in use. Please choose a different port.`,
+          error,
         );
       } else {
-        console.error("Error starting the server:", error);
+        logger.error("Error starting the server:", error);
       }
       process.exit(1);
     });
   } catch (error) {
-    console.error("Error starting the server:", error);
+    logger.error("Error starting the server:", error);
     process.exit(1);
   }
 };
