@@ -15,4 +15,11 @@ export const config = {
     process.env.NODE_ENV === "production"
       ? process.env.FRONTEND_URL
       : "http://localhost:3000",
+  logger: {
+    directory: "logs",
+    files: {
+      error: "error.log",
+      combined: "combined.log",
+    },
+  },
 };
