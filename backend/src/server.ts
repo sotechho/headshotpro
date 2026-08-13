@@ -3,13 +3,12 @@ import logger from "@/utils/logger";
 import app from "./app";
 import connectDB from "./database/connection";
 
-const startServer = () => {
+const startServer = async () => {
   try {
+    await connectDB();
     const server = app.listen(config.port, () =>
       logger.info(`Server is running on http://localhost:${config.port}`),
     );
-
-    void connectDB();
 
     server.on("error", (error: NodeJS.ErrnoException) => {
       if (error.code === "EADDRINUSE") {
@@ -24,7 +23,7 @@ const startServer = () => {
     });
   } catch (error) {
     logger.error("Error starting the server:", error);
-    process.exit(1);
+    // process.exit(1);
   }
 };
 
