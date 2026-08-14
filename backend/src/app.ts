@@ -1,8 +1,9 @@
-import express from "express";
-import cookieParser from "cookie-parser";
 import { config } from "@/config";
-import cors from "cors";
 import v1Routes from "@/routes/v1";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express, { type Request, type Response } from "express";
+import { errorResponse } from "@/utils/responses";
 
 const app = express();
 
@@ -36,7 +37,15 @@ app.get("/", (req, res) => {
 
 app.use(config.apiVersionPrefix.v1, v1Routes);
 
-// TODO: 404
+// 404 Routes
+app.use(function (req: Request, res: Response) {
+  return errorResponse(res, 404, "Route not found", [
+    {
+      path: req.originalUrl,
+      message: "Route not found",
+    },
+  ]);
+});
 
 // TODO: ERROR HANDLING
 
