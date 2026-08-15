@@ -33,7 +33,7 @@ export function errorResponse(
   res: Response,
   statusCode: number,
   message: string,
-  errors: ApiResponse["errors"],
+  errors?: ApiResponse["errors"],
 ): Response {
   const response: ApiResponse = {
     success: false,
