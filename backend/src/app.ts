@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Request, type Response } from "express";
 import { errorResponse } from "@/utils/responses";
+import { errorHandler } from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -26,7 +27,6 @@ app.use(
   }),
 );
 
-// TODO: ROUTES
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "Server is running",
@@ -35,6 +35,7 @@ app.get("/", (req, res) => {
   });
 });
 
+// TODO: ROUTES
 app.use(config.apiVersionPrefix.v1, v1Routes);
 
 // 404 Routes
@@ -47,6 +48,7 @@ app.use(function (req: Request, res: Response) {
   ]);
 });
 
-// TODO: ERROR HANDLING
+// ERROR HANDLING
+app.use(errorHandler);
 
 export default app;
