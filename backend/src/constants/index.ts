@@ -40,3 +40,8 @@ export const errors = {
     status: 402,
   },
 };
+
+export const role = {
+  user: "user",
+  admin: "admin",
+};
