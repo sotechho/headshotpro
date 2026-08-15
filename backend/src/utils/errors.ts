@@ -21,10 +21,10 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  public readonly validationErrors: Record<string, string[]>;
+  public readonly validationErrors: Record<string, string>[];
   constructor(
     message: string = "Validation error",
-    validationErrors: Record<string, string[]> = {},
+    validationErrors: Record<string, string>[],
     isOperational: boolean = true,
   ) {
     super(
