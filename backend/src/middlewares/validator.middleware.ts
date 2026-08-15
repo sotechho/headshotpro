@@ -1,5 +1,5 @@
-import { config } from "@/config";
-import logger from "@/utils/logger";
+import { errors } from "@/constants";
+import { AppError, ValidationError } from "@/utils/errors";
 import type { NextFunction, Request, Response } from "express";
 import { z, ZodError } from "zod";
 
@@ -18,18 +18,12 @@ export function validateRequest(schema: z.ZodType<unknown>) {
           };
         });
 
-        if (config.env === "development") {
-          logger.error("Validation error", error);
-        }
-
-        return next(errors);
+        return next(new ValidationError("Validation error", errors));
       }
 
-      if (config.env === "development") {
-        logger.error("Failed request validation", error);
-      }
+      const { code, status: statusCode } = errors.VALIDATION_ERROR;
 
-      next(error);
+      next(new AppError(statusCode, code, "Validation error", true));
     }
   };
 }
