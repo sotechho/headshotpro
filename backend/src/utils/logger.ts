@@ -24,7 +24,7 @@ const logger = winston.createLogger({
       timestamp,
       ...metadata
     }) {
-      let log = `${timestamp} [${level}]: ${message}`;
+      let log = `${timestamp} [${level.toUpperCase()}]: ${message}`;
 
       // Clean up internal winston metadata flags if they exist
       delete metadata[Symbol.for("splat")];
@@ -44,6 +44,10 @@ const logger = winston.createLogger({
     new winston.transports.File({
       level: "error",
       filename: path.join(logDirectory, config.logger.files.error),
+    }),
+    new winston.transports.File({
+      level: "warn",
+      filename: path.join(logDirectory, config.logger.files.warn),
     }),
   ],
 });
