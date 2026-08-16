@@ -17,6 +17,7 @@
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.6",
+    "@types/nodemailer": "^8.0.1",
     "prettier": "^3.9.6"
   },
   "peerDependencies": {
@@ -30,6 +31,7 @@
     "express": "^5.2.1",
     "helmet": "^8.3.0",
     "mongoose": "8",
+    "nodemailer": "^9.0.5",
     "winston": "^3.19.0",
     "zod": "^4.4.3"
   }
