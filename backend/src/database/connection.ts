@@ -8,18 +8,18 @@ const connectDB = async () => {
     logger.info("Database connected successfully");
   } catch (error) {
     logger.error("Error connecting to the database:", error);
-    process.exit(1);
+    throw error;
   }
 };
 
 mongoose.connection.on("error", (error) => {
   logger.error("Database connection error:", error);
-  process.exit(1);
+  throw error;
 });
 
 mongoose.connection.on("disconnected", () => {
   logger.error("Database connection lost");
-  process.exit(1);
+  throw new Error("Database connection lost");
 });
 
 export default connectDB;
