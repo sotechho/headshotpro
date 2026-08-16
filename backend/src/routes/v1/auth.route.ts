@@ -1,15 +1,10 @@
-import { Router, type Request, type Response } from "express";
+import { register } from "@/controller";
+import { validateRequest } from "@/middlewares/validator.middleware";
+import { registerSchema } from "@/validators/auth.validator";
+import { Router } from "express";
 
 const router = Router();
 
-router.get("/me", (req: Request, res: Response) => {
-  res
-    .status(200)
-    .json({
-      message: "Auth route is working",
-      status: "success",
-      timestamp: new Date().toISOString(),
-    });
-});
+router.post("/register", validateRequest(registerSchema), register);
 
 export default router;
