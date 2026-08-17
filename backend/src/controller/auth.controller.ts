@@ -7,12 +7,13 @@ export async function register(req: Request, res: Response) {
   const user = await authService.registerUser(data);
   return createdResponse(res, "User registered successfully", {
     user: {
-      _id: user._id,
+      id: user._id.toString(),
       username: user.username,
       email: user.email,
       isActive: user.isActive,
       credits: user.credits,
       role: user.role,
+      emailVerified: user.emailVerified,
     },
   });
 }

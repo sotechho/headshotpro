@@ -18,6 +18,7 @@ app.use(
   cors({
     origin: config.frontendUrl,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    credentials:true,
     allowedHeaders: [
       "Content-Type",
       "Authorization",
