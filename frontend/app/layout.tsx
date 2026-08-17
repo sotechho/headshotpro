@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { QueryProvider } from "@/lib/query";
+import { Toaster } from "@/components/ui/toast";
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -32,8 +34,9 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
       >
-        {children}
-      </body>
+        <QueryProvider>{children}</QueryProvider>
+        <Toaster />
+        </body>
     </html>
   );
 }
