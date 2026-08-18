@@ -45,13 +45,12 @@ export class MailService {
     }
   }
 
-  private checkMailConfig(): void {
+  private checkMailConfig(): boolean {
     if (!this.transporter) {
-      throw new ExternalServiceError(
-        "SMTP not initialized yet!",
-        "Mail Service",
-      );
+      logger.error("SMTP not initialized yet!",{service:"Mail Service"})
+      return false
     }
+    return true
   }
 
   private async wrapInLayout(content: string): Promise<string> {
@@ -77,7 +76,7 @@ export class MailService {
   ): Promise<void> {
     try {
       // check transporter
-      this.checkMailConfig();
+      if(!this.checkMailConfig()) return;
 
       logger.info(`Sending email ${to} ${subject} ${templateName}`);
 
@@ -124,7 +123,7 @@ export class MailService {
     email: string,
     name: string,
     verificationToken: string,
-  ) {
+  ):Promise<void> {
     const data = {
       name,
       verificationUrl: `${config.frontendUrl}/verify-email/?token=${verificationToken}`,
