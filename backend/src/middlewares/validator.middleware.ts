@@ -1,10 +1,10 @@
-import { errors } from "@/constants";
-import { AppError, ValidationError } from "@/utils/errors";
-import type { NextFunction, Request, Response } from "express";
-import { z, ZodError } from "zod";
+import { errors } from '@/constants';
+import { AppError, ValidationError } from '@/utils/errors';
+import type { NextFunction, Request, Response } from 'express';
+import { z, ZodError } from 'zod';
 
 export function validateRequest(schema: z.ZodType<unknown>) {
-  return function (req: Request, res: Response, next: NextFunction) {
+  return function (req: Request, _res: Response, next: NextFunction) {
     try {
       const validated = z.parse(schema, req.body);
       req.body = validated;
@@ -13,17 +13,43 @@ export function validateRequest(schema: z.ZodType<unknown>) {
       if (error instanceof ZodError) {
         const errors = error.issues.map((issue) => {
           return {
-            path: issue.path.join("."),
+            path: issue.path.join('.'),
             message: issue.message,
           };
         });
 
-        return next(new ValidationError("Validation error", errors));
+        return next(new ValidationError('Validation error', errors));
       }
 
       const { code, status: statusCode } = errors.VALIDATION_ERROR;
 
-      next(new AppError(statusCode, code, "Validation error", true));
+      next(new AppError(statusCode, code, 'Validation error', true));
+    }
+  };
+}
+
+export function validateQuery(schema: z.ZodType<unknown>) {
+  return function (req: Request, _res: Response, next: NextFunction) {
+    try {
+      const validated = schema.parse(req.query);
+
+      Object.assign('query', validated);
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errors = error.issues.map((issue) => {
+          return {
+            path: issue.path.join('.'),
+            message: issue.message,
+          };
+        });
+
+        return next(new ValidationError('Validation error', errors));
+      }
+
+      const { code, status: statusCode } = errors.VALIDATION_ERROR;
+
+      next(new AppError(statusCode, code, 'Validation error', true));
     }
   };
 }

@@ -1,15 +1,19 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const registerSchema = z.object({
-  email: z.email({ error: "Invalid email provided" }).trim().toLowerCase(),
+  email: z.email({ error: 'Invalid email provided' }).trim().toLowerCase(),
   username: z.string().trim().optional(),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters long")
+    .min(8, 'Password must be at least 8 characters long')
     .trim()
-    .regex(/[A-Z]/, "Password must contain at least one capital latter")
-    .regex(/[a-z]/, "Password must contain at least one small latter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .regex(/[A-Z]/, 'Password must contain at least one capital latter')
+    .regex(/[a-z]/, 'Password must contain at least one small latter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+});
+
+export const verifyEmailSchema = z.object({
+  token: z.string({ error: 'Token is required' }).min(1),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
