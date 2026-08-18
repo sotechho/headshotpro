@@ -1,4 +1,4 @@
-import type { Response } from "express";
+import type { Response } from 'express';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -15,10 +15,10 @@ export interface ApiResponse<T = unknown> {
 
 export function successResponse<T = unknown>(
   res: Response,
-  statusCode: number,
   message: string,
+  statusCode: number = 200,
   data?: T,
-  meta?: ApiResponse["meta"],
+  meta?: ApiResponse['meta'],
 ): Response {
   const response: ApiResponse = {
     success: true,
@@ -33,7 +33,7 @@ export function errorResponse(
   res: Response,
   statusCode: number,
   message: string,
-  errors?: ApiResponse["errors"],
+  errors?: ApiResponse['errors'],
 ): Response {
   const response: ApiResponse = {
     success: false,
@@ -48,7 +48,7 @@ export function createdResponse<T>(
   message: string,
   data?: T,
 ): Response {
-  return successResponse(res, 201, message, data);
+  return successResponse(res, message, 201, data);
 }
 
 export function noContentResponse(res: Response): Response {
@@ -67,7 +67,7 @@ export function paginatedResponse<T>(
 ): Response {
   const totalPages = Math.ceil(pagination.total / pagination.limit);
 
-  return successResponse(res, 200, message, data, {
+  return successResponse(res, message, 200, data, {
     page: pagination.page,
     limit: pagination.limit,
     total: pagination.total,
