@@ -1,10 +1,10 @@
-import { User, type IUser } from "@/models/User.model";
-import { normalizeEmail } from "@/utils";
-import { ConflictError } from "@/utils/errors";
-import type { RegisterInput } from "@/validators/auth.validator";
-import { passwordService } from "./password.service";
-import { verificationService } from "./verification.service";
-import { mailService } from "../notifications/";
+import { User, type IUser } from '@/models/User.model';
+import { normalizeEmail } from '@/utils';
+import { BadRequestError, ConflictError } from '@/utils/errors';
+import type { RegisterInput } from '@/validators/auth.validator';
+import { passwordService } from './password.service';
+import { verificationService } from './verification.service';
+import { mailService } from '../notifications/';
 
 class AuthService {
   async registerUser(input: RegisterInput): Promise<IUser> {
@@ -26,7 +26,7 @@ class AuthService {
 
     // username from email or actual username
     const username: string = (
-      input.username ? input.username.trim() : normalizedEmail.split("@")[0]
+      input.username ? input.username.trim() : normalizedEmail.split('@')[0]
     ) as string;
 
     // store
@@ -48,7 +48,32 @@ class AuthService {
     return user;
   }
 
-  async checkUserExists(email: string): Promise<void> {
+  async verifyUserEmail(token: string): Promise<void> {
+    // Find user using token
+    const user = await User.findOne({ emailVerificationToken: token }).select(
+      '+emailVerificationToken +emailVerificationTokenExpires',
+    );
+
+    if (!user) {
+      throw new BadRequestError('Invalid token provided');
+    }
+
+    const expired = verificationService.isTokenExpires(
+      user.emailVerificationTokenExpires as Date,
+    );
+
+    if (expired) {
+      throw new BadRequestError('Verification token expired');
+    }
+
+    user.emailVerificationToken = undefined;
+    user.emailVerificationTokenExpires = undefined;
+    user.emailVerified = true;
+
+    await user.save();
+  }
+
+  private async checkUserExists(email: string): Promise<void> {
     const userExists = await User.findOne({ email });
     if (userExists) {
       throw new ConflictError(
