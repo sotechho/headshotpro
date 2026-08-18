@@ -131,3 +131,15 @@ export class InsufficientCreditError extends AppError {
     Object.setPrototypeOf(this, InsufficientCreditError.prototype);
   }
 }
+
+export class BadRequestError extends AppError {
+  constructor(message:string = "Bad Request",isOperational: boolean = true){
+    super(
+      errors.BAD_REQUEST.status,
+      errors.BAD_REQUEST.code,
+      message,
+      isOperational
+    )
+    Object.setPrototypeOf(this, BadRequestError.prototype);
+  }
+}
