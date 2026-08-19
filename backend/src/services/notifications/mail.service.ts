@@ -126,7 +126,7 @@ export class MailService {
   ):Promise<void> {
     const data = {
       name,
-      verificationUrl: `${config.frontendUrl}/verify-email/?token=${verificationToken}`,
+      verificationUrl: `${config.frontendUrl}/verify-email?token=${verificationToken}`,
     };
 
     logger.info("Verification email data", data);
