@@ -29,11 +29,8 @@ router.post(
   validateRequest(resendVerificationSchema),
   authController.resendVerificationEmail,
 );
-router.post(
-  '/login',
-  validateRequest(loginSchema),
-  authController.login,
-);
+router.post('/login', validateRequest(loginSchema), authController.login);
 
-router.get("/me",validate,authController.getCurrentUser)
+router.get('/me', validate, authController.getCurrentUser);
+router.post('/refresh-token', authController.refreshToken);
 export default router;

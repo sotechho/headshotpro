@@ -1,5 +1,9 @@
 import { User, type IUser } from '@/models/User.model';
-import type { LoginServiceResponse, TokenPayload } from '@/types';
+import type {
+  GenerateAccessAndRefreshToken,
+  LoginServiceResponse,
+  TokenPayload,
+} from '@/types';
 import { normalizeEmail } from '@/utils';
 import {
   BadRequestError,
@@ -177,6 +181,32 @@ class AuthService {
     }
 
     return user;
+  }
+
+  async refreshToken(token: string): Promise<GenerateAccessAndRefreshToken> {
+    const payload = tokenService.verifyRefreshToken(token);
+    const user = await User.findById(payload.userId);
+
+    if (!user) {
+      throw new NotFoundError('user not exists');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedError(
+        'contact the support team your account is deactivated',
+      );
+    }
+
+    const tokens = tokenService.generateAccessAndRefreshTokens({
+      userId: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    user.refreshToken = tokens.refreshToken;
+    await user.save();
+
+    return tokens;
   }
 
   // helpers

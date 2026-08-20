@@ -104,3 +104,27 @@ export async function getCurrentUser(req: Request, res: Response) {
     },
   });
 }
+
+export async function refreshToken(req: Request, res: Response) {
+  const token = req.cookies.refreshToken || req.body.refreshToken;
+
+  if (!token) {
+    throw new ValidationError('refresh token is required', [
+      { path: 'refreshToken', message: 'refresh token is required' },
+    ]);
+  }
+
+  const { accessToken, refreshToken } = await authService.refreshToken(token);
+
+  res.cookie('accessToken', accessToken, {
+    maxAge: 15 * 60 * 1000, // 15 minutes
+    ...cookieOptions,
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    ...cookieOptions,
+  });
+
+  return successResponse(res, 'Token refreshed successfully');
+}
