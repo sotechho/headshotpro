@@ -1,4 +1,5 @@
 import { User, type IUser } from '@/models/User.model';
+import type { LoginServiceResponse } from '@/types';
 import { normalizeEmail } from '@/utils';
 import {
   BadRequestError,
@@ -7,9 +8,10 @@ import {
   UnauthorizedError,
 } from '@/utils/errors';
 import type { RegisterInput } from '@/validators/auth.validator';
-import { passwordService } from './password.service';
-import { verificationService } from './verification.service';
 import { mailService } from '../notifications/';
+import { passwordService } from './password.service';
+import { tokenService } from './token.service';
+import { verificationService } from './verification.service';
 
 class AuthService {
   async registerUser(input: RegisterInput): Promise<IUser> {
@@ -114,6 +116,51 @@ class AuthService {
       name,
       emailVerificationToken,
     );
+  }
+
+  async login(email: string, password: string): Promise<LoginServiceResponse> {
+    const normalizedEmail = normalizeEmail(email);
+
+    const user = await User.findOne({ email: normalizedEmail }).select(
+      '+password',
+    );
+
+    if (!user) {
+      throw new UnauthorizedError('Invalid email or password');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedError(
+        'Contact the support team your account is deactivated',
+      );
+    }
+
+    if (!user.emailVerified) {
+      throw new UnauthorizedError('Verify your email to login');
+    }
+
+    const isMatched = await passwordService.comparePassword(
+      password,
+      user.password,
+    );
+
+    if (!isMatched) {
+      throw new UnauthorizedError('Invalid email or password');
+    }
+
+    const tokens = tokenService.generateAccessAndRefreshTokens({
+      email: normalizedEmail,
+      userId: user._id.toString(),
+      role: user.role,
+    });
+
+    user.refreshToken = tokens.refreshToken;
+    await user.save();
+    
+    return {
+      user,
+      ...tokens,
+    };
   }
 
   // helpers

@@ -4,6 +4,7 @@ import {
   validateRequest,
 } from '@/middlewares/validator.middleware';
 import {
+  loginSchema,
   registerSchema,
   resendVerificationSchema,
   verifyEmailSchema,
@@ -26,5 +27,10 @@ router.post(
   '/resend-verification',
   validateRequest(resendVerificationSchema),
   authController.resendVerificationEmail,
+);
+router.post(
+  '/login',
+  validateRequest(loginSchema),
+  authController.login,
 );
 export default router;

@@ -20,4 +20,10 @@ export const resendVerificationSchema = z.object({
   email: z.email({ error: 'Email is required' }).trim().toLowerCase(),
 });
 
+export const loginSchema = z.object({
+  email: z.email({ error: 'Email is required' }).trim().toLowerCase(),
+  password: z.string({ error: 'Password is required' }),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
