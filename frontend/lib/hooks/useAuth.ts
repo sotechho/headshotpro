@@ -1,0 +1,35 @@
+import { authService } from '@/lib/services';
+import { useMutation } from '@tanstack/react-query';
+import {
+  LoginInputValues,
+  RegisterInputValues,
+  ResendInputValues,
+} from '../validations';
+
+export const authKeys = {
+  all: ['auth'],
+};
+
+export function useRegister() {
+  return useMutation({
+    mutationFn: (data: RegisterInputValues) => authService.register(data),
+  });
+}
+
+export function useResendVerification() {
+  return useMutation({
+    mutationFn: (data: ResendInputValues) => authService.resendVerification(data),
+  });
+}
+
+export function useVerifyEmail() {
+  return useMutation({
+    mutationFn: (token: string) => authService.verifyEmail(token),
+  });
+}
+
+export function useLogin() {
+  return useMutation({
+    mutationFn: (data: LoginInputValues) => authService.login(data),
+  });
+}
