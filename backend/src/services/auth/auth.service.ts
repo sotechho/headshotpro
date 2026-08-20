@@ -1,6 +1,11 @@
 import { User, type IUser } from '@/models/User.model';
 import { normalizeEmail } from '@/utils';
-import { BadRequestError, ConflictError } from '@/utils/errors';
+import {
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from '@/utils/errors';
 import type { RegisterInput } from '@/validators/auth.validator';
 import { passwordService } from './password.service';
 import { verificationService } from './verification.service';
@@ -73,6 +78,45 @@ class AuthService {
     await user.save();
   }
 
+  async resendVerificationEmail(email: string): Promise<void> {
+    const normalizedEmail = normalizeEmail(email);
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      throw new NotFoundError(
+        `Not found account with ${normalizedEmail} please register your account`,
+      );
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedError(
+        'Your account is deactivated please contact the support',
+      );
+    }
+
+    if (user.emailVerified) {
+      throw new ConflictError('Email already verified');
+    }
+
+    const emailVerificationToken = verificationService.generateToken();
+    const emailVerificationTokenExpires =
+      verificationService.generateExpirationDate();
+
+    user.emailVerificationToken = emailVerificationToken;
+    user.emailVerificationTokenExpires = emailVerificationTokenExpires;
+    user.emailVerified = false;
+
+    await user.save();
+
+    const name = user.username || (normalizedEmail.split('@')[0] as string);
+    await mailService.sendVerificationMail(
+      normalizedEmail,
+      name,
+      emailVerificationToken,
+    );
+  }
+
+  // helpers
   private async checkUserExists(email: string): Promise<void> {
     const userExists = await User.findOne({ email });
     if (userExists) {

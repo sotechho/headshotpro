@@ -16,4 +16,8 @@ export const verifyEmailSchema = z.object({
   token: z.string({ error: 'Token is required' }).min(1),
 });
 
+export const resendVerificationSchema = z.object({
+  email: z.email({ error: 'Email is required' }).trim().toLowerCase(),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;

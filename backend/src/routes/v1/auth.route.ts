@@ -3,7 +3,11 @@ import {
   validateQuery,
   validateRequest,
 } from '@/middlewares/validator.middleware';
-import { registerSchema, verifyEmailSchema } from '@/validators/auth.validator';
+import {
+  registerSchema,
+  resendVerificationSchema,
+  verifyEmailSchema,
+} from '@/validators/auth.validator';
 import { Router } from 'express';
 
 const router = Router();
@@ -17,5 +21,10 @@ router.get(
   '/verify-email',
   validateQuery(verifyEmailSchema),
   authController.verifyEmail,
+);
+router.post(
+  '/resend-verification',
+  validateRequest(resendVerificationSchema),
+  authController.resendVerificationEmail,
 );
 export default router;

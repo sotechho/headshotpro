@@ -1,5 +1,5 @@
 import { authService } from '@/services/auth';
-import { BadRequestError } from '@/utils/errors';
+import { BadRequestError, ValidationError } from '@/utils/errors';
 import logger from '@/utils/logger';
 import { createdResponse, successResponse } from '@/utils/responses';
 import { type Request, type Response } from 'express';
@@ -26,8 +26,25 @@ export async function verifyEmail(req: Request, res: Response) {
   if (!token || typeof token !== 'string') {
     throw new BadRequestError('Missing verification token');
   }
-  
+
   await authService.verifyUserEmail(token);
 
   return successResponse(res, 'Email verified successfully');
+}
+
+export async function resendVerificationEmail(req: Request, res: Response) {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new ValidationError('Email is required', [
+      { path: 'email', message: 'Email is required' },
+    ]);
+  }
+
+  await authService.resendVerificationEmail(email);
+
+  return successResponse(
+    res,
+    'Verification email resended please check your inbox',
+  );
 }
