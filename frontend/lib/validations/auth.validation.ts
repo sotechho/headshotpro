@@ -13,3 +13,10 @@ export const registerSchema = z.object({
 });
 
 export type RegisterInputValues = z.infer<typeof registerSchema>;
+
+export const loginSchema = z.object({
+  email: z.email({ error: 'Invalid email' }).trim().toLowerCase(),
+  password: z.string({ error: 'Password is required' }),
+});
+
+export type LoginInputValues = z.infer<typeof loginSchema>;

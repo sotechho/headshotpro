@@ -8,12 +8,7 @@ export interface User {
   emailVerified: boolean;
 }
 
-export interface RegisterInput {
-  username?: string;
-  email: string;
-  password: string;
-}
-
-export interface RegisterResponse {
-  user: User;
+export interface BaseResponse {
+  message: string;
+  success: boolean;
 }
