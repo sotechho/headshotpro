@@ -1,5 +1,6 @@
 import { config } from '@/config';
 import { authService } from '@/services/auth';
+import type { TokenPayload } from '@/types';
 import { BadRequestError, ValidationError } from '@/utils/errors';
 import { createdResponse, successResponse } from '@/utils/responses';
 import type { LoginInput } from '@/validators/auth.validator';
@@ -75,6 +76,23 @@ export async function login(req: Request, res: Response) {
   });
 
   return successResponse(res, 'Login successfully', 200, {
+    user: {
+      id: user._id.toString(),
+      username: user.username,
+      email: user.email,
+      isActive: user.isActive,
+      credits: user.credits,
+      role: user.role,
+      emailVerified: user.emailVerified,
+    },
+  });
+}
+
+export async function getCurrentUser(req: Request, res: Response) {
+  const user = await authService.getCurrentUser(
+    req.user as unknown as TokenPayload,
+  );
+  return successResponse(res, 'User fetched successfully', 200, {
     user: {
       id: user._id.toString(),
       username: user.username,

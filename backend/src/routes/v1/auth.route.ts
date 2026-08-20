@@ -1,4 +1,5 @@
 import { authController } from '@/controller';
+import { validate } from '@/middlewares';
 import {
   validateQuery,
   validateRequest,
@@ -33,4 +34,6 @@ router.post(
   validateRequest(loginSchema),
   authController.login,
 );
+
+router.get("/me",validate,authController.getCurrentUser)
 export default router;
