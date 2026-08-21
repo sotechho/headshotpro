@@ -185,7 +185,7 @@ class AuthService {
 
   async refreshToken(token: string): Promise<GenerateAccessAndRefreshToken> {
     const payload = tokenService.verifyRefreshToken(token);
-    const user = await User.findById(payload.userId);
+    const user = await User.findById(payload.userId).select('+refreshToken');
 
     if (!user) {
       throw new NotFoundError('user not exists');
@@ -195,6 +195,10 @@ class AuthService {
       throw new UnauthorizedError(
         'contact the support team your account is deactivated',
       );
+    }
+
+    if (token !== user.refreshToken) {
+      throw new UnauthorizedError('Invalid token');
     }
 
     const tokens = tokenService.generateAccessAndRefreshTokens({
