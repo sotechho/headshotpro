@@ -19,4 +19,7 @@ export const authService = {
   resendVerification: async (data: ResendInputValues): Promise<void> => {
     return api.post('/auth/resend-verification', data);
   },
+  getCurrentUser: async (): Promise<{ user: User }> => {
+    return api.get('/auth/me');
+  },
 };

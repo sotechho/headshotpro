@@ -1,5 +1,5 @@
 import { authService } from '@/lib/services';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   LoginInputValues,
   RegisterInputValues,
@@ -8,6 +8,7 @@ import {
 
 export const authKeys = {
   all: ['auth'],
+  currentUser: () => [...authKeys.all, 'current-user'],
 };
 
 export function useRegister() {
@@ -18,7 +19,8 @@ export function useRegister() {
 
 export function useResendVerification() {
   return useMutation({
-    mutationFn: (data: ResendInputValues) => authService.resendVerification(data),
+    mutationFn: (data: ResendInputValues) =>
+      authService.resendVerification(data),
   });
 }
 
@@ -31,5 +33,13 @@ export function useVerifyEmail() {
 export function useLogin() {
   return useMutation({
     mutationFn: (data: LoginInputValues) => authService.login(data),
+  });
+}
+
+export function useGetCurrentUser() {
+  return useQuery({
+    queryKey: authKeys.currentUser(),
+    queryFn: () => authService.getCurrentUser(),
+    staleTime: 5 * 60 * 1000,
   });
 }
