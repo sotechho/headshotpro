@@ -71,12 +71,19 @@ axiosInstance.interceptors.response.use(
       '/auth/refresh-token',
     );
 
+    const isLoginEndpoint = originalRequest?.url?.includes('/auth/login');
+    const isRegisterEndpoint = originalRequest?.url?.includes('/auth/login');
+
     console.log({
       isRefreshEndpoint,
       failed: hasRefreshFailed(),
       retry: originalRequest._retry,
       originalRequest,
     });
+
+    if (isLoginEndpoint || isRegisterEndpoint) {
+      return Promise.reject(error);
+    }
 
     // check the endpoint or if already falied or is in retry
     if (isRefreshEndpoint || hasRefreshFailed() || originalRequest._retry) {
