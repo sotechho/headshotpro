@@ -1,7 +1,11 @@
 import { config } from '@/config';
 import { authService } from '@/services/auth';
 import type { TokenPayload } from '@/types';
-import { BadRequestError, ValidationError } from '@/utils/errors';
+import {
+  BadRequestError,
+  UnauthorizedError,
+  ValidationError,
+} from '@/utils/errors';
 import { createdResponse, successResponse } from '@/utils/responses';
 import type { LoginInput } from '@/validators/auth.validator';
 import { type Request, type Response } from 'express';
@@ -106,12 +110,14 @@ export async function getCurrentUser(req: Request, res: Response) {
 }
 
 export async function refreshToken(req: Request, res: Response) {
-  const token = req.cookies.refreshToken || req.body.refreshToken;
+  let token = req.cookies.refreshToken;
+
+  if (!token && req.body) {
+    token = req.body.refreshToken;
+  }
 
   if (!token) {
-    throw new ValidationError('refresh token is required', [
-      { path: 'refreshToken', message: 'refresh token is required' },
-    ]);
+    throw new UnauthorizedError('refresh token is required');
   }
 
   const { accessToken, refreshToken } = await authService.refreshToken(token);
