@@ -36,10 +36,17 @@ export function useLogin() {
   });
 }
 
-export function useGetCurrentUser() {
+export function useGetCurrentUser(options?: { onErrorRedirect: boolean }) {
   return useQuery({
     queryKey: authKeys.currentUser(),
     queryFn: () => authService.getCurrentUser(),
     staleTime: 5 * 60 * 1000,
+    retry: false,
+    throwOnError: (error: any) => {
+      if (options && options.onErrorRedirect && typeof window !== 'undefined') {
+        window.location.replace('/login');
+      }
+      return false;
+    },
   });
 }
