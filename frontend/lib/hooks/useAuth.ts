@@ -44,16 +44,15 @@ export function useGetCurrentUser(options?: { onErrorRedirect: boolean }) {
     retry: false,
     throwOnError: (error: any) => {
       if (options && options.onErrorRedirect && typeof window !== 'undefined') {
-        window.location.replace('/login');
+        window.location.replace('/auth/login');
       }
       return false;
     },
   });
 }
 
-
-export function useLogout(){
+export function useLogout() {
   return useMutation({
-    mutationFn:()=> authService.logout()
-  })
+    mutationFn: () => authService.logout(),
+  });
 }

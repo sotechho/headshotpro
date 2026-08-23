@@ -40,7 +40,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               onClick={() => {
                 mutate(undefined, {
                   onSuccess: () => {
-                    router.replace('/login');
+                    router.replace('/auth/login');
                   },
                 });
               }}
