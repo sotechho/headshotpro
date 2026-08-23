@@ -50,3 +50,10 @@ export function useGetCurrentUser(options?: { onErrorRedirect: boolean }) {
     },
   });
 }
+
+
+export function useLogout(){
+  return useMutation({
+    mutationFn:()=> authService.logout()
+  })
+}

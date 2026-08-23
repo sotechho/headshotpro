@@ -5,7 +5,8 @@ const devUrl =
   process.env.NEXT_PUBLIC_DEV_BASE_URL || 'http://localhost:8000/api/v1';
 const prodUrl = process.env.NEXT_PUBLIC_PROD_BASE_URL;
 
-const baseUrl = process.env.NODE_ENV === 'development' ? devUrl : prodUrl;
+export const baseUrl =
+  process.env.NODE_ENV === 'development' ? devUrl : prodUrl;
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
