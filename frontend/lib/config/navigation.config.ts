@@ -1,0 +1,42 @@
+import {
+  CreditCard,
+  HomeIcon,
+  LayoutDashboard,
+  LucideIcon,
+  Settings,
+  Users,
+} from 'lucide-react';
+
+export interface NavigationItem {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+export interface NavigationConfig {
+  [key: string]: NavigationItem[];
+}
+
+export const userNavigation: NavigationItem[] = [
+  { name: 'Dashboard', href: '/dashboard/user', icon: LayoutDashboard },
+  { name: 'Credits', href: '/dashboard/user/credits', icon: CreditCard },
+  { name: 'Setting', href: '/dashboard/user/setting', icon: Settings },
+];
+
+export const adminNavigation: NavigationItem[] = [
+  { name: 'Dashboard', href: '/dashboard/user', icon: LayoutDashboard },
+  { name: 'Users', href: '/dashboard/users', icon: Users },
+  { name: 'Credits', href: '/dashboard/user/credits', icon: CreditCard },
+  { name: 'Setting', href: '/dashboard/user/setting', icon: Settings },
+];
+
+export function getUserNavigation(role: string): NavigationItem[] {
+  switch (role) {
+    case 'user':
+      return userNavigation;
+    case 'admin':
+      return adminNavigation;
+    default:
+      return userNavigation;
+  }
+}
