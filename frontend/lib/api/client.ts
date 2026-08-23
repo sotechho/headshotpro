@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
 
 const devUrl =
-  process.env.NEXT_PUBLIC_DEV_BASE_URL || 'http://localhost:8000/api/v1/';
+  process.env.NEXT_PUBLIC_DEV_BASE_URL || 'http://localhost:8000/api/v1';
 const prodUrl = process.env.NEXT_PUBLIC_PROD_BASE_URL;
 
 const baseUrl = process.env.NODE_ENV === 'development' ? devUrl : prodUrl;
@@ -72,7 +72,7 @@ axiosInstance.interceptors.response.use(
     );
 
     const isLoginEndpoint = originalRequest?.url?.includes('/auth/login');
-    const isRegisterEndpoint = originalRequest?.url?.includes('/auth/login');
+    const isRegisterEndpoint = originalRequest?.url?.includes('/auth/register');
 
     console.log({
       isRefreshEndpoint,
