@@ -29,7 +29,7 @@ export function VerifyEmailComponent() {
             description:
               'Your email address is confirmed. You can sign in now.',
           });
-          router.push('/login');
+          router.push('/auth/login');
         },
         onError: (error) => {
           toast.add({
@@ -62,7 +62,7 @@ export function VerifyEmailComponent() {
               link to continue.
             </p>
             <div className="mt-6">
-              <Link href="/resend-verification">
+              <Link href="/auth/resend-verification">
                 <Button className="w-full">Request a new link</Button>
               </Link>
             </div>
@@ -91,7 +91,7 @@ export function VerifyEmailComponent() {
               Your email address is confirmed. Sign in to continue.
             </p>
             <div className="mt-6">
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button className="w-full">Continue to sign in</Button>
               </Link>
             </div>
@@ -114,10 +114,10 @@ export function VerifyEmailComponent() {
               )}
             </p>
             <div className="mt-6 flex flex-col gap-4">
-              <Link href="/resend-verification">
+              <Link href="/auth/resend-verification">
                 <Button className="w-full">Request a new link</Button>
               </Link>
-              <Link href="/register">
+              <Link href="/auth/register">
                 <Button variant="outline" className="w-full">
                   Create a new account
                 </Button>

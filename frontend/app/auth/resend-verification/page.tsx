@@ -4,44 +4,44 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
-import { useLogin } from '@/lib/hooks';
+import { useResendVerification } from '@/lib/hooks';
 import { getApiErrorMessage } from '@/lib/utils';
-import { LoginInputValues, loginSchema } from '@/lib/validations';
+import { ResendInputValues, resendVerifictionSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Controller, useForm } from 'react-hook-form';
 
-export default function LoginPage() {
-  const { mutate, isPending } = useLogin();
-  const form = useForm<LoginInputValues>({
-    resolver: zodResolver(loginSchema),
+export default function ResendVerificationPage() {
+  const { mutate, isPending } = useResendVerification();
+  const form = useForm<ResendInputValues>({
+    resolver: zodResolver(resendVerifictionSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   });
 
   const router = useRouter();
 
-  async function onSubmit(values: LoginInputValues) {
+  async function onSubmit(values: ResendInputValues) {
     mutate(values, {
       onSuccess: (data) => {
         toast.add({
           type: 'success',
-          title: 'Welcome back',
-          description: 'You have been signed in successfully.',
+          title: 'Verification email sent',
+          description:
+            'Check your inbox, then follow the link to verify your email.',
         });
-        router.push('/');
+        router.push('/auth/login');
       },
       onError(error: unknown) {
         toast.add({
           type: 'error',
-          title: 'Unable to sign in',
+          title: 'Unable to send the verification email',
           description: getApiErrorMessage(
             error,
-            'Please check your email and password and try again.',
+            'Please check the email address and try again.',
           ),
         });
       },
@@ -52,10 +52,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8 rounded-2xl bg-card p-8 shadow-lg border border-border">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-foreground">
-            Welcome back
+            Verify your email
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to continue to Headshot Pro
+            Enter your email and we will send you a new verification link.
           </p>
         </div>
 
@@ -83,49 +83,26 @@ export default function LoginPage() {
               </Field>
             )}
           />
-
-          {/* password feild controller */}
-          <Controller
-            control={form.control}
-            name="password"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="password"
-                  {...field}
-                  id={field.name}
-                  aria-invalid={fieldState.invalid}
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
           {/* Submit Button */}
           <Button type="submit" disabled={isPending} className="w-full">
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
+                Sending email...
               </>
             ) : (
-              'Sign in'
+              'Send verification email'
             )}
           </Button>
 
           {/* Links */}
           <div className="text-center text-sm text-muted-foreground">
-            New to Headshot Pro?{' '}
+            Need an account?{' '}
             <Link
-              href="/register"
+              href="/auth/register"
               className="font-medium text-foreground hover:underline"
             >
-              Create an account
+              Register
             </Link>
           </div>
         </form>

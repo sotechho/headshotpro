@@ -1,54 +1,47 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from '@/components/ui/field';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { useRegister } from '@/lib/hooks';
+import { toast } from '@/components/ui/toast';
+import { useLogin } from '@/lib/hooks';
 import { getApiErrorMessage } from '@/lib/utils';
-import { RegisterInputValues, registerSchema } from '@/lib/validations';
+import { LoginInputValues, loginSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { Controller, useForm } from 'react-hook-form';
-import { toast } from '@/components/ui/toast';
 import { useRouter } from 'next/navigation';
+import { Controller, useForm } from 'react-hook-form';
 
-export default function RegisterPage() {
-  const { mutate, isPending } = useRegister();
-  const form = useForm<RegisterInputValues>({
-    resolver: zodResolver(registerSchema),
+export default function LoginPage() {
+  const { mutate, isPending } = useLogin();
+  const form = useForm<LoginInputValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
-      username: '',
       password: '',
     },
   });
 
   const router = useRouter();
 
-  async function onSubmit(values: RegisterInputValues) {
+  async function onSubmit(values: LoginInputValues) {
     mutate(values, {
       onSuccess: (data) => {
         toast.add({
           type: 'success',
-          title: 'Account created',
-          description:
-            'Check your inbox for a verification link before signing in.',
+          title: 'Welcome back',
+          description: 'You have been signed in successfully.',
         });
-        router.push('/login');
+        router.push('/');
       },
       onError(error: unknown) {
         toast.add({
           type: 'error',
-          title: 'Unable to create your account',
+          title: 'Unable to sign in',
           description: getApiErrorMessage(
             error,
-            'Please review your details and try again.',
+            'Please check your email and password and try again.',
           ),
         });
       },
@@ -59,38 +52,16 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-8 rounded-2xl bg-card p-8 shadow-lg border border-border">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-foreground">
-            Create Account
+            Welcome back
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Create your Headshot Pro account
+            Sign in to continue to Headshot Pro
           </p>
         </div>
 
         {/* form */}
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
-          {/* username feild controller */}
-          <Controller
-            control={form.control}
-            name="username"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
-                <Input
-                  type="text"
-                  placeholder="John Doe"
-                  autoComplete="name"
-                  {...field}
-                  id={field.name}
-                  aria-invalid={fieldState.invalid}
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
           {/* email feild controller */}
           <Controller
             control={form.control}
@@ -123,15 +94,11 @@ export default function RegisterPage() {
                 <Input
                   type="password"
                   placeholder="••••••••"
-                  autoComplete="new-password"
+                  autoComplete="password"
                   {...field}
                   id={field.name}
                   aria-invalid={fieldState.invalid}
                 />
-                <FieldDescription>
-                  Use at least 8 characters, including an uppercase letter, a
-                  lowercase letter, and a number.
-                </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -144,21 +111,21 @@ export default function RegisterPage() {
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating account...
+                Signing in...
               </>
             ) : (
-              'Create Account'
+              'Sign in'
             )}
           </Button>
 
           {/* Links */}
           <div className="text-center text-sm text-muted-foreground">
-            Already have an account?
+            New to Headshot Pro?{' '}
             <Link
-              href="/login"
+              href="/auth/register"
               className="font-medium text-foreground hover:underline"
             >
-              Sign in instead
+              Create an account
             </Link>
           </div>
         </form>
