@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-export async function validate(
+export async function authenticate(
   req: Request,
   _res: Response,
   next: NextFunction,

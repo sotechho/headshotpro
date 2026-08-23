@@ -1,5 +1,5 @@
 import { authController } from '@/controller';
-import { validate } from '@/middlewares';
+import { authenticate } from '@/middlewares';
 import {
   validateQuery,
   validateRequest,
@@ -31,6 +31,8 @@ router.post(
 );
 router.post('/login', validateRequest(loginSchema), authController.login);
 
-router.get('/me', validate, authController.getCurrentUser);
+router.get('/me', authenticate, authController.getCurrentUser);
 router.post('/refresh-token', authController.refreshToken);
+router.post('/logout', authenticate, authController.logout);
+
 export default router;

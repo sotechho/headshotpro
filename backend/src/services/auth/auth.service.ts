@@ -213,6 +213,10 @@ class AuthService {
     return tokens;
   }
 
+  async logout(payload: TokenPayload) {
+    await User.findByIdAndUpdate(payload.userId, { refreshToken: null });
+  }
+
   // helpers
   private async checkUserExists(email: string): Promise<void> {
     const userExists = await User.findOne({ email });

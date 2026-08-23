@@ -134,3 +134,12 @@ export async function refreshToken(req: Request, res: Response) {
 
   return successResponse(res, 'Token refreshed successfully');
 }
+
+export async function logout(req: Request, res: Response) {
+  await authService.logout(req.user as unknown as TokenPayload);
+
+  res.clearCookie('accessToken', cookieOptions);
+  res.clearCookie('refreshToken', cookieOptions);
+
+  return successResponse(res, 'User logout successfully');
+}
