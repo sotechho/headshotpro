@@ -24,7 +24,7 @@ export const userNavigation: NavigationItem[] = [
 ];
 
 export const adminNavigation: NavigationItem[] = [
-  { name: 'Dashboard', href: '/dashboard/user', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/dashboard/admin', icon: LayoutDashboard },
   { name: 'Users', href: '/dashboard/users', icon: Users },
   { name: 'Credits', href: '/dashboard/user/credits', icon: CreditCard },
   { name: 'Setting', href: '/dashboard/user/setting', icon: Settings },

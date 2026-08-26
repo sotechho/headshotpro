@@ -1,8 +1,9 @@
+import DashboardLayout from '@/components/dashboard/dashboard-layout';
 import { UserContextProvider } from '@/lib/context/user-context';
 import { getCurrentUserServer } from '@/lib/util/server-auth';
 import { redirect } from 'next/navigation';
 
-export default async function DashboardLayout({
+export default async function RootDashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -10,8 +11,12 @@ export default async function DashboardLayout({
   const user = await getCurrentUserServer();
 
   if (!user) {
-    return redirect('/login', 'replace');
+    return redirect('/auth/login', 'replace');
   }
 
-  return <UserContextProvider user={user}>{children}</UserContextProvider>;
+  return (
+    <UserContextProvider user={user}>
+      <DashboardLayout>{children}</DashboardLayout>
+    </UserContextProvider>
+  );
 }
