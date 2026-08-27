@@ -1,4 +1,4 @@
-export interface CreditPackage {
+export interface ICreditPackage {
   _id: string;
   _v: number;
   name: string;
