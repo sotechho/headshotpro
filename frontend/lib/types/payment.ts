@@ -12,3 +12,52 @@ export interface ICreditPackage {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export enum PaymentPlatform {
+  STRIPE = 'STRIPE',
+  EVC = 'EVC',
+  ZAAD = 'ZAAD',
+  SAHAL = 'SAHAL',
+  EBIR = 'EBIR',
+  LOCAL = 'LOCAL', // For cash/local payments that need manual approval
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
+}
+
+export interface StripeCheckoutConfig {
+  userId: string;
+  packageId: string;
+  platform: PaymentPlatform;
+  successUrl: string;
+  cancelUrl: string;
+}
+
+export interface IProcessPayment {
+  userId: string;
+  packageId: string;
+  platform: PaymentPlatform;
+  phone?: string;
+  successUrl: string;
+  cancelUrl: string;
+}
+
+export interface IPaymentResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+  error?: any;
+  sessionId?: string;
+  orderId?: string;
+  transactionId?: string;
+  amount?: number;
+  credits?: number;
+  redirectUrl?: string;
+  cancelUrl?: string;
+  status?: PaymentStatus;
+}

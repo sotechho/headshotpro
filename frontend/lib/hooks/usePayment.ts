@@ -1,10 +1,28 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { paymentService } from '@/lib/services';
+import { IPaymentResponse, IProcessPayment } from '../types/payment';
+import { toast } from '@/components/ui/toast';
 
 export function useGetCreditPackages() {
   return useQuery({
     queryKey: ['credit-packages'],
     queryFn: () => paymentService.getCreditPackages(),
     retry: 2,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+}
+
+export function useProcessPayment() {
+  return useMutation({
+    mutationFn: (checkoutData: IProcessPayment) =>
+      paymentService.processPayment(checkoutData),
+    onSuccess: (data: IPaymentResponse) => {
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
+        toast.add({ title: data.message });
+      }
+    },
   });
 }
