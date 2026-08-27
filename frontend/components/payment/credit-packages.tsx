@@ -4,7 +4,7 @@ import { CreditPackageCard } from './credit-package';
 type CreditPackagesProps = {
   packages: ICreditPackage[];
   isLoading: boolean;
-  onSelectPackage: (value: string | null) => void;
+  onSelectPackage: (pkg: ICreditPackage) => void;
   selectedPackageId: string | null;
 };
 
@@ -36,7 +36,7 @@ export function CreditPackages({
   }
 
   function handleSelect(pkg: ICreditPackage) {
-    onSelectPackage(pkg._id);
+    onSelectPackage(pkg);
     console.log(pkg);
   }
   return (

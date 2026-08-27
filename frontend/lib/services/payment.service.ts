@@ -12,6 +12,6 @@ export const paymentService = {
   processPayment: (
     checkoutData: IProcessPayment,
   ): Promise<IPaymentResponse> => {
-    return api.post<IPaymentResponse>('/payment/packages', checkoutData);
+    return api.post<IPaymentResponse>('/payment/process', checkoutData);
   },
 };
