@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { baseUrl } from './lib/api';
+import { parseSetCookie } from './lib/util';
 
 export async function middleware(req: NextRequest, res: NextResponse) {
   const { nextUrl } = req;
@@ -47,27 +48,22 @@ export async function middleware(req: NextRequest, res: NextResponse) {
           // Extract cookies and set
           const setCookies = refreshTokneResponse.headers.get('set-cookie');
           if (setCookies) {
-            const cookies = setCookies.split(',');
-            cookies.forEach((cookie) => {
-              const [nameValue] = cookie.split(';');
-              const [name, value] = nameValue.split('=');
-              // console.log(cookie)
-              // console.log(nameValue)
-              if (name && value) {
-                console.log({ name, value });
-                response.cookies.set(name.trim(), value.trim(), {
-                  httpOnly: true,
-                  secure: process.env.NODE_ENV === 'production',
-                  sameSite: 'lax' as const,
-                  path: '/',
-                  maxAge:
-                    name.toLowerCase() == 'refreshtoken'
-                      ? 7 * 24 * 60 * 60 * 1000
-                      : 15 * 60 * 1000,
-                });
-              }
-            });
-
+            const cookiesArray = parseSetCookie(setCookies);
+            for (const cookie of cookiesArray) {
+              response.cookies.set({
+                name: cookie.key,
+                value: cookie.value,
+                maxAge: Number(cookie.attributes['Max-Age']),
+                path: cookie.attributes.Path,
+                expires: cookie.attributes.Expires,
+                httpOnly: cookie.attributes.HttpOnly,
+                sameSite: cookie.attributes.SameSite.toLowerCase() as
+                  | 'lax'
+                  | 'strict'
+                  | 'none',
+                secure: process.env.NODE_ENV === 'production',
+              });
+            }
             return response;
           }
         } else {
