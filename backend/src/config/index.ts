@@ -58,4 +58,8 @@ export const config = {
   },
   smtp,
   jwt,
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY || '',
+    webhookSecretKey: process.env.STRIPE_WEBHOOK_SECRET || '',
+  },
 };
