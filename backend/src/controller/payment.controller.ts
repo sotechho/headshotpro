@@ -17,3 +17,19 @@ export async function getCreditPackageById(req: Request, res: Response) {
   const creditPackage = await paymentService.getCreditPackageById(id);
   return successResponse(res, 'Credit package fetched', 200, creditPackage);
 }
+
+export async function processPayment(req: Request, res: Response) {
+  const { packageId, userId, platform, phone, cancelUrl, successUrl } =
+    req.body;
+
+  const paymentResponse = await paymentService.processPayment({
+    packageId,
+    userId,
+    cancelUrl,
+    platform,
+    successUrl,
+    phone,
+  });
+
+  return successResponse(res, paymentResponse.message, 200, paymentResponse);
+}
