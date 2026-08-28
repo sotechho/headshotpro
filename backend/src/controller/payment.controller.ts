@@ -1,5 +1,5 @@
 import { paymentService } from '@/services/payment/payment.service';
-import { BadRequestError } from '@/utils/errors';
+import { BadRequestError, NotFoundError } from '@/utils/errors';
 import { successResponse } from '@/utils/responses';
 import type { Request, Response } from 'express';
 
@@ -19,8 +19,13 @@ export async function getCreditPackageById(req: Request, res: Response) {
 }
 
 export async function processPayment(req: Request, res: Response) {
-  const { packageId, userId, platform, phone, cancelUrl, successUrl } =
-    req.body;
+  const userId = req.user?.userId;
+  
+  if (!userId) {
+    throw new NotFoundError('User is required');
+  }
+
+  const { packageId, platform, phone, cancelUrl, successUrl } = req.body;
 
   const paymentResponse = await paymentService.processPayment({
     packageId,

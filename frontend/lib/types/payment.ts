@@ -31,7 +31,6 @@ export enum PaymentStatus {
 }
 
 export interface StripeCheckoutConfig {
-  userId: string;
   packageId: string;
   platform: PaymentPlatform;
   successUrl: string;
@@ -39,7 +38,6 @@ export interface StripeCheckoutConfig {
 }
 
 export interface IProcessPayment {
-  userId: string;
   packageId: string;
   platform: PaymentPlatform;
   phone?: string;
