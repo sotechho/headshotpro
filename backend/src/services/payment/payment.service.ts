@@ -88,9 +88,10 @@ class PaymentService {
         customerEmail,
       });
 
-      order.status = PaymentStatus.PROCESSING;
-      order.stripeSessionId = session.sessionId;
-      await order.save();
+      await Order.findByIdAndUpdate(order._id, {
+        status: PaymentStatus.PROCESSING,
+        stripeSessionId: session.sessionId,
+      });
 
       return {
         success: true,
