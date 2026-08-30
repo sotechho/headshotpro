@@ -81,6 +81,30 @@ class StripeService {
       );
     }
   }
+
+  async parseWebhook(
+    rawData: string | Buffer,
+    signature: string,
+  ): Promise<any> {
+    try {
+      const webHookSecret = config.stripe.webhookSecretKey;
+      if (!webHookSecret) {
+        logger.warn('Stripe webhook credentials not configured');
+        throw new ExternalServiceError(
+          'stripe webhook configuration missing credentials','stripe'
+        );
+      }
+      const event = await this.stripe.webhooks.constructEventAsync(
+        rawData,
+        signature,
+        webHookSecret,
+      );
+      return event;
+    } catch (error) {
+      logger.error('stripe webhook event parse failed', error);
+      throw new ExternalServiceError('stripe webhook event parse failed','stripe');
+    }
+  }
 }
 
 export const stripeService = new StripeService();

@@ -1,5 +1,10 @@
 import { paymentService } from '@/services/payment/payment.service';
-import { BadRequestError, NotFoundError } from '@/utils/errors';
+import {
+  BadRequestError,
+  ExternalServiceError,
+  NotFoundError,
+} from '@/utils/errors';
+import logger from '@/utils/logger';
 import { successResponse } from '@/utils/responses';
 import type { Request, Response } from 'express';
 
@@ -20,7 +25,7 @@ export async function getCreditPackageById(req: Request, res: Response) {
 
 export async function processPayment(req: Request, res: Response) {
   const userId = req.user?.userId;
-  
+
   if (!userId) {
     throw new NotFoundError('User is required');
   }
@@ -37,4 +42,15 @@ export async function processPayment(req: Request, res: Response) {
   });
 
   return successResponse(res, paymentResponse.message, 200, paymentResponse);
+}
+
+export async function stripeWebhookHandler(req: Request, res: Response) {
+  logger.info('Webhook recieved');
+  const signature: string = req.headers['stripe-signature'] as string;
+  if (!signature) {
+    logger.error('Stripe signature not found');
+    throw new ExternalServiceError('Stripe signature not found', 'stripe');
+  }
+  await paymentService.processStripeWebhook(req.body, signature);
+  return successResponse(res, 'Webhook successfully recieved');
 }
