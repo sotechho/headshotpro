@@ -1,37 +1,45 @@
-import { config } from "@/config";
-import v1Routes from "@/routes/v1";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import express, { type Request, type Response } from "express";
-import { errorResponse } from "@/utils/responses";
-import { errorHandler } from "./middlewares/error.middleware";
+import { config } from '@/config';
+import v1Routes from '@/routes/v1';
+import { errorResponse } from '@/utils/responses';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express, { type Request, type Response } from 'express';
+import { paymentController } from './controller';
+import { errorHandler } from './middlewares/error.middleware';
 
 const app = express();
 
+app.post(
+  '/api/v1/webhooks/stripe',
+  express.raw({ type: 'application/json' }),
+  paymentController.stripeWebhookHandler,
+);
+
 // MIDDLEWARES
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // CORS
 app.use(
   cors({
     origin: config.frontendUrl,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials:true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
     allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Cookie",
-      "stripe-signature",
+      'Content-Type',
+      'Authorization',
+      'Cookie',
+      'stripe-signature',
     ],
   }),
 );
 
-app.get("/", (req, res) => {
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.get('/', (_req: Request, res: Response) => {
   res.status(200).json({
-    message: "Server is running",
-    status: "success",
+    message: 'Server is running',
+    status: 'success',
     timestamp: new Date().toISOString(),
   });
 });
@@ -41,10 +49,10 @@ app.use(config.apiVersionPrefix.v1, v1Routes);
 
 // 404 Routes
 app.use(function (req: Request, res: Response) {
-  return errorResponse(res, 404, "Route not found", [
+  return errorResponse(res, 404, 'Route not found', [
     {
       path: req.originalUrl,
-      message: "Route not found",
+      message: 'Route not found',
     },
   ]);
 });
