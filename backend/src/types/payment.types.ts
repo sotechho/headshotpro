@@ -137,3 +137,9 @@ export interface ProcessPaymentPrams {
   successUrl: string;
   cancelUrl: string;
 }
+
+
+export interface ISuccessfullPayment {
+  orderId:string;
+  source:"STRIPE" | "LOCAL" | "ADMIN"
+}
