@@ -105,6 +105,38 @@ class StripeService {
       throw new ExternalServiceError('stripe webhook event parse failed','stripe');
     }
   }
+
+  async processStripeWebhook(rawData: string | Buffer, signature: string):Promise<void> {
+    try {
+      logger.info('Recieved signature', { signature });
+      const event = await this.parseWebhook(rawData, signature);
+      const session = event.data.object as any;
+      logger.info('Webhook event parsed', { type:event.type, data: session});
+      
+      switch(event.type){
+        case 'checkout.session.completed':
+          break;
+        case 'payment_intent.payment_failed':
+          break;
+        default:
+          logger.info('Unhandled event type received from stripe', { type: event.type });
+          break;
+      }
+      
+    } catch (error: any) {
+      logger.error('Failed to process stripe webhook', error);
+
+      if (error instanceof AppError) {
+        throw error;
+      }
+
+      throw new AppError(
+        500,
+        'STRIPE_PAYMENT_WEBHOOK_ERROR',
+        'Failed to process stripe webhook',
+      );
+    }
+  }
 }
 
 export const stripeService = new StripeService();

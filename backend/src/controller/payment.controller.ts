@@ -1,4 +1,5 @@
 import { paymentService } from '@/services/payment/payment.service';
+import { stripeService } from '@/services/payment/stripe.service';
 import {
   BadRequestError,
   ExternalServiceError,
@@ -51,6 +52,6 @@ export async function stripeWebhookHandler(req: Request, res: Response) {
     logger.error('Stripe signature not found');
     throw new ExternalServiceError('Stripe signature not found', 'stripe');
   }
-  await paymentService.processStripeWebhook(req.body, signature);
+  await stripeService.processStripeWebhook(req.body, signature);
   return successResponse(res, 'Webhook successfully recieved');
 }
