@@ -1,10 +1,9 @@
-import { config } from "@/config";
-import { ExternalServiceError } from "@/utils/errors";
-import logger from "@/utils/logger";
-import { templateEngine } from "@/utils/templateEngine";
-import fs from "fs/promises";
-import nodemailer, { type SendMailOptions, type Transporter } from "nodemailer";
-import path from "path";
+import { config } from '@/config';
+import logger from '@/utils/logger';
+import { templateEngine } from '@/utils/templateEngine';
+import fs from 'fs/promises';
+import nodemailer, { type SendMailOptions, type Transporter } from 'nodemailer';
+import path from 'path';
 
 export class MailService {
   private transporter: Transporter | null = null;
@@ -29,42 +28,42 @@ export class MailService {
 
         this.transporter.verify(function (error, success): void {
           if (error) {
-            logger.error("SMTP connection failed", {
+            logger.error('SMTP connection failed', {
               error: error.message,
               code: (error as any).code,
             });
           } else {
-            logger.info("SMTP connection established");
+            logger.info('SMTP connection established');
           }
         });
       } catch (error) {
-        logger.error("SMTP configuration error", error);
+        logger.error('SMTP configuration error', error);
       }
     } else {
-      logger.warn("SMTP credentials not configured yet!");
+      logger.warn('SMTP credentials not configured yet!');
     }
   }
 
   private checkMailConfig(): boolean {
     if (!this.transporter) {
-      logger.error("SMTP not initialized yet!",{service:"Mail Service"})
-      return false
+      logger.error('SMTP not initialized yet!', { service: 'Mail Service' });
+      return false;
     }
-    return true
+    return true;
   }
 
   private async wrapInLayout(content: string): Promise<string> {
     const layoutPath = path.join(
       process.cwd(),
-      "src",
-      "templates",
-      "emails",
-      "layout",
-      "base.html",
+      'src',
+      'templates',
+      'emails',
+      'layout',
+      'base.html',
     );
 
-    const layout = await fs.readFile(layoutPath, "utf-8");
-    return layout.replace("{{content}}", content);
+    const layout = await fs.readFile(layoutPath, 'utf-8');
+    return layout.replace('{{content}}', content);
   }
 
   // send template email
@@ -76,19 +75,19 @@ export class MailService {
   ): Promise<void> {
     try {
       // check transporter
-      if(!this.checkMailConfig()) return;
+      if (!this.checkMailConfig()) return;
 
       logger.info(`Sending email ${to} ${subject} ${templateName}`);
 
       const htmlContent = await templateEngine.render(
         templateName,
         data,
-        ".html",
+        '.html',
       );
-      const text = await templateEngine.render(templateName, data, ".txt");
+      const text = await templateEngine.render(templateName, data, '.txt');
       const html = await this.wrapInLayout(htmlContent);
 
-      logger.info("Rendered content", {
+      logger.info('Rendered content', {
         text,
         html,
       });
@@ -101,19 +100,19 @@ export class MailService {
         html,
       };
 
-      logger.info("Sending email options", mailOptions);
+      logger.info('Sending email options', mailOptions);
 
       const result = await this.transporter!.sendMail(mailOptions);
 
       if (result.rejected && result.rejected.length > 0) {
-        logger.warn("Email Rejected", {
+        logger.warn('Email Rejected', {
           to,
           subject,
           rejected: result.rejected,
           response: result.response,
         });
       }
-      logger.info("Sender email result", result);
+      logger.info('Sender email result', result);
     } catch (error: any) {
       throw error;
     }
@@ -123,17 +122,43 @@ export class MailService {
     email: string,
     name: string,
     verificationToken: string,
-  ):Promise<void> {
+  ): Promise<void> {
     const data = {
       name,
       verificationUrl: `${config.frontendUrl}/verify-email?token=${verificationToken}`,
     };
 
-    logger.info("Verification email data", data);
+    logger.info('Verification email data', data);
     await this.sendTemplateMail(
       email,
-      "Verify Your Email",
-      "verification",
+      'Verify Your Email',
+      'verification',
+      data,
+    );
+  }
+
+  async sendPaymentSuccessMail(
+    email: string,
+    name: string,
+    orderId: string,
+    amount: number,
+    credits: number,
+    newBalance: number,
+  ): Promise<void> {
+    const data = {
+      name,
+      orderId,
+      amount,
+      credits,
+      newBalance,
+      dashboardUrl: `${config.frontendUrl}/dashboard/user/credits`,
+    };
+
+    logger.info('Payment success email data', data);
+    await this.sendTemplateMail(
+      email,
+      'Payment Successful!',
+      'payment-success',
       data,
     );
   }
