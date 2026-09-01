@@ -6,6 +6,7 @@ import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 import { paymentController } from './controller';
 import { errorHandler } from './middlewares/error.middleware';
+import inngestRoute from './routes/inngest.route';
 
 const app = express();
 
@@ -44,9 +45,9 @@ app.get('/', (_req: Request, res: Response) => {
   });
 });
 
-// TODO: ROUTES
+// ROUTES
 app.use(config.apiVersionPrefix.v1, v1Routes);
-
+app.use(inngestRoute);
 // 404 Routes
 app.use(function (req: Request, res: Response) {
   return errorResponse(res, 404, 'Route not found', [
