@@ -7,10 +7,16 @@ import {
   type PaymentResponse,
   type ProcessPaymentPrams,
 } from '@/types/payment.types';
-import { AppError, BadRequestError, NotFoundError } from '@/utils/errors';
+import {
+  AppError,
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+} from '@/utils/errors';
 import logger from '@/utils/logger';
 import mongoose from 'mongoose';
 import { stripeService } from './stripe.service';
+import { triggerAddUserCredits } from '../queue';
 
 class PaymentService {
   async getCreditPackages(): Promise<ICreditPackage[]> {
@@ -171,6 +177,38 @@ class PaymentService {
 
       return result!;
     } catch (error) {
+      throw error;
+    }
+  }
+
+  async processSuccessfulPayment(
+    orderId: string,
+    source: 'STRIPE' | 'LOCAL' | 'ADMIN' = 'STRIPE',
+  ): Promise<void> {
+    try {
+      const order = await Order.findById(orderId);
+      if (!order) {
+        throw new NotFoundError(
+          'Order not found in stripe checkout session completed',
+        );
+      }
+
+      if (order.creditsAdded) {
+        logger.error('user credits already added', { orderId, source });
+        throw new ConflictError('User credits already added');
+      }
+
+      await triggerAddUserCredits({
+        orderId,
+        source,
+        credits: order.credits,
+        userId: order.user.toString(),
+      });
+    } catch (error) {
+      logger.error('Failed to proccess successfull payment', {
+        orderId,
+        source,
+      });
       throw error;
     }
   }

@@ -1,8 +1,18 @@
 import { config } from '@/config';
-import type { StripePaymentResponse } from '@/types/payment.types';
-import { AppError, ExternalServiceError } from '@/utils/errors';
+import { Order } from '@/models/Order.modal';
+import {
+  PaymentStatus,
+  type StripePaymentResponse,
+} from '@/types/payment.types';
+import {
+  AppError,
+  ConflictError,
+  ExternalServiceError,
+  NotFoundError,
+} from '@/utils/errors';
 import logger from '@/utils/logger';
 import Stripe from 'stripe';
+import { paymentService } from './payment.service';
 
 class StripeService {
   private stripe: Stripe;
@@ -91,7 +101,8 @@ class StripeService {
       if (!webHookSecret) {
         logger.warn('Stripe webhook credentials not configured');
         throw new ExternalServiceError(
-          'stripe webhook configuration missing credentials','stripe'
+          'stripe webhook configuration missing credentials',
+          'stripe',
         );
       }
       const event = await this.stripe.webhooks.constructEventAsync(
@@ -102,27 +113,35 @@ class StripeService {
       return event;
     } catch (error) {
       logger.error('stripe webhook event parse failed', error);
-      throw new ExternalServiceError('stripe webhook event parse failed','stripe');
+      throw new ExternalServiceError(
+        'stripe webhook event parse failed',
+        'stripe',
+      );
     }
   }
 
-  async processStripeWebhook(rawData: string | Buffer, signature: string):Promise<void> {
+  async processStripeWebhook(
+    rawData: string | Buffer,
+    signature: string,
+  ): Promise<void> {
     try {
       logger.info('Recieved signature', { signature });
       const event = await this.parseWebhook(rawData, signature);
       const session = event.data.object as any;
-      logger.info('Webhook event parsed', { type:event.type, data: session});
-      
-      switch(event.type){
+      logger.info('Webhook event parsed', { type: event.type, data: session });
+
+      switch (event.type) {
         case 'checkout.session.completed':
+          await this.handleStripeCheckoutSessionCompleted(session);
           break;
         case 'payment_intent.payment_failed':
           break;
         default:
-          logger.info('Unhandled event type received from stripe', { type: event.type });
+          logger.info('Unhandled event type received from stripe', {
+            type: event.type,
+          });
           break;
       }
-      
     } catch (error: any) {
       logger.error('Failed to process stripe webhook', error);
 
@@ -134,6 +153,69 @@ class StripeService {
         500,
         'STRIPE_PAYMENT_WEBHOOK_ERROR',
         'Failed to process stripe webhook',
+      );
+    }
+  }
+
+  private async handleStripeCheckoutSessionCompleted(
+    session: any,
+  ): Promise<void> {
+    try {
+      const stripeSessionId = session.id as string;
+      let order = await Order.findOne({ stripeSessionId });
+
+      if (!order && session.metadata.orderId) {
+        order = await Order.findById(session.metadata.orderId);
+      }
+
+      if (!order) {
+        throw new NotFoundError(
+          'Order not found in stripe checkout session completed',
+        );
+      }
+
+      await Order.findByIdAndUpdate(order._id, {
+        stripePaymentIntentId: session.payment_intent as string,
+        stripeSessionId,
+      });
+
+      if (order.status === PaymentStatus.COMPLETED) {
+        throw new ConflictError('Order already completed');
+      }
+
+      if (session.payment_status === 'paid') {
+        // process successful payment logic
+        await paymentService.processSuccessfulPayment(
+          order._id.toString(),
+          'STRIPE',
+        );
+      } else {
+        logger.error('Stripe payment failed', {
+          orderId: order._id,
+          userId: order.user,
+          sessionId: session.id,
+          paymentStatus: session.payment_status,
+        });
+
+        throw new AppError(
+          400,
+          'STRIPE_PAYMENT_FAILED',
+          'Stripe payment failed',
+        );
+      }
+    } catch (error: any) {
+      logger.error('Failed to handle stripe checkout session completed', {
+        ...error,
+      });
+
+      if (error instanceof AppError) {
+        throw error;
+      }
+
+      throw new AppError(
+        500,
+        'STRIPE_PAYMENT_WEBHOOK_ERROR',
+        'Failed to handle stripe checkout session completed',
       );
     }
   }
