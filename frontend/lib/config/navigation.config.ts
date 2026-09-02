@@ -1,8 +1,8 @@
 import {
   CreditCard,
-  HomeIcon,
   LayoutDashboard,
   LucideIcon,
+  Receipt,
   Settings,
   Users,
 } from 'lucide-react';
@@ -20,6 +20,7 @@ export interface NavigationConfig {
 export const userNavigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/dashboard/user', icon: LayoutDashboard },
   { name: 'Credits', href: '/dashboard/user/credits', icon: CreditCard },
+  { name: 'Orders', href: '/dashboard/user/orders', icon: Receipt },
   { name: 'Setting', href: '/dashboard/user/setting', icon: Settings },
 ];
 
