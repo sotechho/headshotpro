@@ -6,7 +6,7 @@ import {
   NotFoundError,
 } from '@/utils/errors';
 import logger from '@/utils/logger';
-import { successResponse } from '@/utils/responses';
+import { errorResponse, successResponse } from '@/utils/responses';
 import type { Request, Response } from 'express';
 
 export async function getCreditPackages(req: Request, res: Response) {
@@ -42,6 +42,15 @@ export async function processPayment(req: Request, res: Response) {
     phone,
   });
 
+  if (!paymentResponse.success) {
+    return errorResponse(
+      res,
+      400,
+      paymentResponse.message,
+      paymentResponse.error || {},
+    );
+  }
+
   return successResponse(res, paymentResponse.message, 200, paymentResponse);
 }
 
@@ -54,4 +63,23 @@ export async function stripeWebhookHandler(req: Request, res: Response) {
   }
   await stripeService.processStripeWebhook(req.body, signature);
   return successResponse(res, 'Webhook successfully recieved');
+}
+
+export async function getPaymentOrders(req: Request, res: Response) {
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    throw new NotFoundError('User is required');
+  }
+
+  const limit = (req.query.limit as string) || 10;
+
+  const orders = await paymentService.orders(Number(limit)); // Adjust limit as needed
+  return successResponse(res, 'Payment history fetched', 200, orders);
+}
+
+export async function getOrderById(req: Request, res: Response) {
+  const { id } = req.params;
+  const order = await paymentService.getOrderById(id as string);
+  return successResponse(res, 'Order fetched', 200, order);
 }

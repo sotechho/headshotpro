@@ -10,5 +10,7 @@ router.get('/packages/:id', paymentController.getCreditPackageById);
 router.use(authenticate);
 
 router.post('/process', paymentController.processPayment);
+router.get('/orders', paymentController.getPaymentOrders);
+router.get('/orders/:id', paymentController.getOrderById);
 
 export default router;
