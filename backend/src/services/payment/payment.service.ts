@@ -17,6 +17,7 @@ import logger from '@/utils/logger';
 import mongoose from 'mongoose';
 import { stripeService } from './stripe.service';
 import { triggerAddUserCredits } from '../queue';
+import { mobileWalletService } from './mwallet.service';
 
 class PaymentService {
   async getCreditPackages(): Promise<ICreditPackage[]> {
@@ -45,7 +46,9 @@ class PaymentService {
     const orders = await Order.find()
       .limit(limit)
       .sort({ createdAt: -1 })
-      .select('-paymentDetails');
+      .select('-paymentDetails')
+      .populate(['package', 'user']);
+
     return orders;
   }
 
@@ -198,8 +201,30 @@ class PaymentService {
           userId,
           customerEmail: user?.email,
         });
-      }
+      } else if (
+        platform === PaymentPlatform.EVC ||
+        platform === PaymentPlatform.ZAAD ||
+        platform === PaymentPlatform.SAHAL ||
+        platform === PaymentPlatform.EBIR
+      ) {
+        if (!phone) {
+          throw new BadRequestError(
+            'Phone number is required for mobile wallet payment',
+          );
+        }
 
+        logger.info(`Processing ${platform} payment for order ${order._id}`);
+
+        result = await mobileWalletService.processWalletPayment(
+          platform,
+          order,
+          phone,
+        );
+
+        if (result.success) {
+          await this.processSuccessfulPayment(order._id.toString(), 'LOCAL');
+        }
+      }
       return result!;
     } catch (error) {
       throw error;

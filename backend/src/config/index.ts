@@ -35,6 +35,20 @@ const jwt = {
   refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES || '7d',
 };
 
+const waafipay = {
+  MERCHANT_U_ID: process.env.MERCHANT_U_ID || '',
+  MERCHANT_API_KEY: process.env.MERCHANT_API_KEY || '',
+  MERCHANT_API_USER_ID: process.env.MERCHANT_API_USER_ID || '',
+  MERCHANT_API_END_POINT: process.env.MERCHANT_API_END_POINT || '',
+};
+
+const ebir = {
+  EBIR_MERCHANT_U_ID: process.env.EBIR_MERCHANT_U_ID || '',
+  EBIR_MERCHANT_API_KEY: process.env.EBIR_MERCHANT_API_KEY || '',
+  EBIR_MERCHANT_API_USER_ID: process.env.EBIR_MERCHANT_API_USER_ID || '',
+  EBIR_MERCHANT_API_END_POINT: process.env.EBIR_MERCHANT_API_END_POINT || '',
+};
+
 export const config = {
   env: process.env.NODE_ENV || 'development',
   port: process.env.PORT || 8000,
@@ -62,4 +76,6 @@ export const config = {
     secretKey: process.env.STRIPE_SECRET_KEY || '',
     webhookSecretKey: process.env.STRIPE_WEBHOOK_SECRET || '',
   },
+  waafipay,
+  ebir,
 };
