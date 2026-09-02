@@ -41,6 +41,25 @@ class PaymentService {
     return creditPackage;
   }
 
+  async orders(limit: number): Promise<IOrder[]> {
+    const orders = await Order.find()
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .select('-paymentDetails');
+    return orders;
+  }
+
+  async getOrderById(id: string): Promise<IOrder> {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestError('Invalid order id');
+    }
+    const order = await Order.findById(id).select('-paymentDetails');
+    if (!order) {
+      throw new NotFoundError('Order not found');
+    }
+    return order;
+  }
+
   async createOrder({
     packageId,
     userId,
