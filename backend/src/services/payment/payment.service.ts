@@ -62,7 +62,7 @@ class PaymentService {
     return order;
   }
 
-  async processStripePayment({
+  async stripePaymentProcess({
     creditPackage,
     cancelUrl,
     successUrl,
@@ -102,6 +102,12 @@ class PaymentService {
       return {
         success: true,
         message: 'Successfully created stripe session',
+        sessionId: session.sessionId,
+        amount: creditPackage.price,
+        credits: totalCredits,
+        orderId: order._id.toString(),
+        status: PaymentStatus.PROCESSING,
+        data: session,
         redirectUrl: session.redirectUrl,
       };
     } catch (error: any) {
@@ -164,7 +170,7 @@ class PaymentService {
       // check which platform user want to pay
       if (platform === PaymentPlatform.STRIPE) {
         // process stripe payment platform
-        result = await this.processStripePayment({
+        result = await this.stripePaymentProcess({
           cancelUrl,
           successUrl,
           creditPackage,
