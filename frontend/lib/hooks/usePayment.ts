@@ -26,3 +26,23 @@ export function useProcessPayment() {
     },
   });
 }
+
+export function useGetPaymentOrders() {
+  return useQuery({
+    queryKey: ['payment-orders'],
+    queryFn: () => paymentService.getPaymentOrders(),
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+}
+
+export function useGetOrderById(id: string) {
+  return useQuery({
+    queryKey: ['payment-order', id],
+    queryFn: () => paymentService.getOrderById(id),
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+}

@@ -3,6 +3,7 @@ import {
   ICreditPackage,
   IProcessPayment,
   IPaymentResponse,
+  IOrder,
 } from '@/lib/types/payment';
 
 export const paymentService = {
@@ -13,5 +14,11 @@ export const paymentService = {
     checkoutData: IProcessPayment,
   ): Promise<IPaymentResponse> => {
     return api.post<IPaymentResponse>('/payment/process', checkoutData);
+  },
+  getPaymentOrders: (): Promise<IOrder[]> => {
+    return api.get<IOrder[]>('/payment/orders');
+  },
+  getOrderById: (id: string): Promise<IOrder> => {
+    return api.get<IOrder>(`/payment/orders/${id}`);
   },
 };
