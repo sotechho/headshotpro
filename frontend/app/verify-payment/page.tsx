@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingFallback } from '@/components/loading';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
@@ -19,7 +20,14 @@ export default function VerifyPaymentPage() {
   }, [router]);
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense
+      fallback={
+        <LoadingFallback
+          title="Payment Successful!"
+          message="Processing your credits..."
+        />
+      }
+    >
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center space-y-4">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
@@ -30,19 +38,5 @@ export default function VerifyPaymentPage() {
         </div>
       </div>
     </Suspense>
-  );
-}
-
-function LoadingFallback() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center space-y-4">
-        <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-        <h2 className="text-xl font-semibold">Payment Successful!</h2>
-        <p className="text-sm text-muted-foreground">
-          Processing your credits...
-        </p>
-      </div>
-    </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   PaymentMethodSelector,
   StripeCheckoutSection,
 } from '@/components/payment';
+import { LocalPaymentForm } from '@/components/payment/local-payment-form';
 import { toast } from '@/components/ui/toast';
 import { useUser } from '@/lib/context/user-context';
 import { useGetCreditPackages, useProcessPayment } from '@/lib/hooks';
@@ -51,6 +52,24 @@ export default function CreditsPage() {
 
     processPayment(checkout);
   }
+
+  function handleLocalPaymentSubmit(phone: string, method: string) {
+    // Implementation for handling local payment submission
+    if (!selectedPackage) {
+      toast.add({ title: 'Please select a package' });
+      return;
+    }
+    const checkout = {
+      packageId: selectedPackage._id as string,
+      platform: method as PaymentPlatform,
+      phone,
+    };
+
+    console.log('Local payment checkout:', checkout);
+
+    processPayment(checkout);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -75,7 +94,12 @@ export default function CreditsPage() {
             isLoading={isProcessing}
             onCheckout={handleStripeCheckout}
           />
-        ) : null)}
+        ) : (
+          <LocalPaymentForm
+            isLoading={isProcessing}
+            onSubmit={handleLocalPaymentSubmit}
+          />
+        ))}
     </div>
   );
 }
