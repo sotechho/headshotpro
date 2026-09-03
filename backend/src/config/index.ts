@@ -78,4 +78,9 @@ export const config = {
   },
   waafipay,
   ebir,
+  upload: {
+    allowedFilesMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    maxFiles: 1,
+    maxFileSize: 10 * 1024 * 1024, // 10 MB
+  },
 };
