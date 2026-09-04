@@ -79,8 +79,20 @@ export const config = {
   waafipay,
   ebir,
   upload: {
-    allowedFilesMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    allowedFilesMimeTypes: [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+    ],
     maxFiles: 1,
     maxFileSize: 10 * 1024 * 1024, // 10 MB
+  },
+  aws: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    accessSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
+    bucketName: process.env.AWS_BUCKET_NAME || 'headshotpros3bucket',
+    region: process.env.AWS_REGION,
+    version: process.env.AWS_VERSION || '2010-12-01',
   },
 };
