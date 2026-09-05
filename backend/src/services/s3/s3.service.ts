@@ -20,6 +20,29 @@ class S3Service {
     return `${prefix}/${userId}/${timestamp}-${randomString}.${fileExtension}`;
   }
 
+  private async uploadFile(
+    userId: string,
+    fileBuffer: Buffer,
+    key: string,
+  ): Promise<UploadFileResponse> {
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+      Body: fileBuffer,
+      Metadata: {
+        userId,
+        uploadedAt: new Date().toISOString(),
+      },
+    });
+    await s3Client.send(command);
+    const url = `https://${this.bucketName}.s3.${config.aws.region}.amazonaws.com/${key}`;
+    return {
+      key,
+      bucket: this.bucketName,
+      url,
+    };
+  }
+
   async uploadOriginalFile(
     userId: string,
     fileBuffer: Buffer,
@@ -27,28 +50,23 @@ class S3Service {
   ): Promise<UploadFileResponse> {
     try {
       const key = this.generateKey(userId, 'original', fileExtension);
-      const command = new PutObjectCommand({
-        Bucket: this.bucketName,
-        Key: key,
-        Body: fileBuffer,
-        Metadata: {
-          userId,
-          uploadedAt: new Date().toISOString(),
-        },
-      });
-      await s3Client.send(command);
-      const url = `https://${this.bucketName}.s3.${config.aws.region}.amazonaws.com/${key}`;
-      return {
-        key,
-        bucket: this.bucketName,
-        url,
-      };
+      return this.uploadFile(userId, fileBuffer, key);
     } catch (error: any) {
-      logger.error('Original File upload failed aws s3', { ...error });
-      throw new ExternalServiceError(
-        'Failed to upload original file upload',
-        's3',
-      );
+      logger.error('Original File upload to aws s3 failed', { ...error });
+      throw new ExternalServiceError('Failed to upload original file', 's3');
+    }
+  }
+  async uploadGeneratedFile(
+    userId: string,
+    fileBuffer: Buffer,
+    fileExtension: string,
+  ): Promise<UploadFileResponse> {
+    try {
+      const key = this.generateKey(userId, 'generated', fileExtension);
+      return this.uploadFile(userId, fileBuffer, key);
+    } catch (error: any) {
+      logger.error('Generated File upload to aws s3 failed', { ...error });
+      throw new ExternalServiceError('Failed to upload generated file', 's3');
     }
   }
 
