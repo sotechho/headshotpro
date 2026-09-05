@@ -5,7 +5,7 @@ export interface IHeadshot extends Document {
   user: mongoose.Types.ObjectId;
   originalPhotoUrl: string; // S3 URL of the original uploaded photo
   originalPhotoKey: string; // S3 key for deletion
-  status:HeadshotStatus;
+  status: HeadshotStatus;
   generatedHeadshots: Array<{
     style: string;
     url: string;
@@ -13,6 +13,7 @@ export interface IHeadshot extends Document {
     createdAt: Date;
   }>;
   selectedStyles: string[]; // Styles user selected for generation
+  customPrompt?: string;
   failureReason?: string;
   processingStartedAt?: Date;
   processingCompletedAt?: Date;
@@ -38,7 +39,7 @@ const headshotSchema = new Schema<IHeadshot>(
     },
     status: {
       type: String,
-      enum:Object.values(HeadshotStatus),
+      enum: Object.values(HeadshotStatus),
       default: HeadshotStatus.PROCESSING,
       index: true,
     },
@@ -67,6 +68,9 @@ const headshotSchema = new Schema<IHeadshot>(
       required: true,
       default: [],
     },
+    customPrompt: {
+      type: String,
+    },
     failureReason: {
       type: String,
     },
@@ -79,7 +83,7 @@ const headshotSchema = new Schema<IHeadshot>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Compound index for efficient queries

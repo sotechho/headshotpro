@@ -1,8 +1,11 @@
 import { AI_PROVIDERS, type AIProvider } from '@/constants/ai.constants';
 import { replicateService } from './replicate/replicate.service';
 import { AppError } from '@/utils/errors';
+import { config } from '@/config';
 
-export function aiService(provider: AIProvider) {
+export function aiService(
+  provider: AIProvider = config.aiProvider as AIProvider,
+) {
   if (!Object.values(AI_PROVIDERS).includes(provider)) {
     throw new AppError(
       500,

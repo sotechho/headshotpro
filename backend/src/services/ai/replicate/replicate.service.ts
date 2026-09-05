@@ -8,7 +8,7 @@ class ReplicateService extends BaseAI {
   private replicate: Replicate;
   constructor() {
     super();
-    if (config.replicate.apiKey) {
+    if (!config.replicate.apiKey) {
       logger.warn('Replicate configuration is missing');
       throw new AppError(
         500,

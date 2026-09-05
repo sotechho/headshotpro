@@ -1,6 +1,10 @@
 import { AI_PROVIDERS } from '@/constants/ai.constants';
-import { parseBool } from '@/utils';
 import dotenv from 'dotenv';
+
+const parseBool = (value: string | undefined, fallback: boolean): boolean => {
+  if (value === undefined) return fallback;
+  return value.toLowerCase() === 'true';
+};
 
 dotenv.config();
 
