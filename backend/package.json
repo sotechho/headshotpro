@@ -41,6 +41,7 @@
     "mongoose": "8",
     "multer": "^2.3.0",
     "nodemailer": "^9.0.5",
+    "replicate": "^1.4.0",
     "stripe": "^22.5.0",
     "winston": "^3.19.0",
     "zod": "^4.4.3"

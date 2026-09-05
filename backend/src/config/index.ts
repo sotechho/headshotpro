@@ -1,3 +1,4 @@
+import { AI_PROVIDERS } from '@/constants/ai.constants';
 import { parseBool } from '@/utils';
 import dotenv from 'dotenv';
 
@@ -95,4 +96,8 @@ export const config = {
     region: process.env.AWS_REGION,
     version: process.env.AWS_VERSION || '2010-12-01',
   },
+  replicate: {
+    apiKey: process.env.REPLICATE_API_KEY || '',
+  },
+  aiProvider: process.env.AI_PROVIDER || AI_PROVIDERS.REPLICATE,
 };
