@@ -1,5 +1,7 @@
 import { headshotService } from '@/services/headshot';
-import { successResponse } from '@/utils/responses';
+import { BadRequestError, UnauthorizedError } from '@/utils/errors';
+import logger from '@/utils/logger';
+import { createdResponse, successResponse } from '@/utils/responses';
 import type { Request, Response } from 'express';
 
 export async function getAvailableStyles(req: Request, res: Response) {
@@ -9,5 +11,53 @@ export async function getAvailableStyles(req: Request, res: Response) {
     'Available Headshot Styles',
     200,
     availableStyles,
+  );
+}
+
+export async function generateHeadshot(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  const {
+    selectedStyles,
+    customPrompt,
+  }: { selectedStyles?: string[]; customPrompt?: string } = req.body;
+  if (!userId) {
+    throw new UnauthorizedError('User not authenticated');
+  }
+
+  logger.info(`Generating headshot for user ${userId}`);
+
+  const file = req.file;
+  if (!file) {
+    logger.error('No file uploaded to generate', {
+      userId,
+    });
+    throw new BadRequestError('File is required');
+  }
+
+  if (!selectedStyles && !customPrompt) {
+    logger.error('Either styles or custom prompt is required', {
+      userId,
+    });
+    throw new BadRequestError('Either styles or custom prompt is required');
+  }
+
+  logger.info('Preparing file buffer and extension');
+  const fileBuffer = Buffer.from(file.buffer);
+  const fileExtension = file.mimetype.split('/')[1] || 'jpg';
+  logger.info(
+    `File buffer and extension prepared: ${fileBuffer.length} bytes, extension: ${fileExtension} calling headshot generation service`,
+  );
+  const headshot = await headshotService.generateHeadshot({
+    userId,
+    selectedStyles,
+    customPrompt,
+    fileBuffer,
+    fileExtension,
+  });
+
+  return createdResponse(
+    res,
+    'Triggered headshot generation it takes some minutes',
+    headshot,
   );
 }
