@@ -1,5 +1,9 @@
 import { api } from '../api';
-import { IHeadshot, IHeadshotStyleInfo } from '../types/headshot';
+import {
+  IHeadshot,
+  IHeadshotsResponse,
+  IHeadshotStyleInfo,
+} from '../types/headshot';
 
 export const headshotService = {
   getAvailableStyles: async (): Promise<IHeadshotStyleInfo[]> => {
@@ -11,5 +15,13 @@ export const headshotService = {
         'Content-Type': 'multipart/form-data',
       },
     });
+  },
+  getHeadshots: async (
+    limit: number = 10,
+    offset: number = 0,
+  ): Promise<IHeadshotsResponse> => {
+    return api.get<IHeadshotsResponse>(
+      `/headshots?limit=${limit}&offset=${offset}`,
+    );
   },
 };

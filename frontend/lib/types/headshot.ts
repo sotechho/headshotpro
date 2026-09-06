@@ -32,3 +32,12 @@ export interface IHeadshot {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IHeadshotsResponse {
+  headshots: IHeadshot[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+  };
+}
