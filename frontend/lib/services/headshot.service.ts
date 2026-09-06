@@ -30,19 +30,14 @@ export const headshotService = {
   deleteHeadshot: async (id: string): Promise<void> => {
     return api.delete(`/headshots/${id}`);
   },
-  downloadHeadshot: async (url: string, filename: string): Promise<void> => {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to download image: ${response.statusText}`);
-    }
-    const blob = await response.blob();
-    const objectUrl = URL.createObjectURL(blob);
+  downloadHeadshot: async (url: string): Promise<void> => {
     const link = document.createElement('a');
-    link.href = objectUrl;
-    link.download = filename;
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(objectUrl);
   },
 };

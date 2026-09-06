@@ -14,14 +14,15 @@ import {
 } from '@/lib/hooks/useHeadshot';
 import { getApiErrorMessage } from '@/lib/utils';
 import { Loader2, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 function HeadshotStudioPage() {
   // generate headshot hook
-  const { mutate: generateHeadshots } = useGenerateHeadshots();
+  const { mutate: generateHeadshots, isPending: isHeadshotGenerationg } =
+    useGenerateHeadshots();
   // headshot styles hook
-  const { data: headshotStyles, isPending: isHeadshotGenerationg } =
-    useGetAvailableStyles();
+  const { data: headshotStyles } = useGetAvailableStyles();
   // style selection state
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   // customer prompt state
@@ -32,6 +33,8 @@ function HeadshotStudioPage() {
   const [selectedFile, setSelectedFile] = useState<File | undefined | null>(
     undefined,
   );
+  // router
+  const router = useRouter();
 
   // Methods
   async function handleGenerateHeadshot() {
@@ -75,6 +78,12 @@ function HeadshotStudioPage() {
             'Failed to generate headshots',
           ),
         });
+      },
+      onSuccess: (data) => {
+        setSelectedFile(null);
+        setSelectedStyles([]);
+        setCustomPrompt(undefined);
+        router.replace('/dashboard/user/headshots');
       },
     });
   }

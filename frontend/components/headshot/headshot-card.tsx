@@ -69,15 +69,7 @@ export function HeadshotCard({ headshot, onDeleted }: HeadshotCardProps) {
         className="flex min-w-0 flex-1 items-center gap-4 text-left"
       >
         <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-primary/10 text-primary">
-          {headshot.originalPhotoUrl ? (
-            <img
-              src={headshot.originalPhotoUrl}
-              alt="Original headshot"
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <Camera className="h-6 w-6" />
-          )}
+          <Camera className="h-6 w-6" />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -91,11 +83,14 @@ export function HeadshotCard({ headshot, onDeleted }: HeadshotCardProps) {
           <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted-foreground">
             <span>{formattedDate}</span>
             <span className="hidden sm:inline">•</span>
-            <span>
-              {headshot.status === HeadshotStatus.PROCESSING
-                ? 'Generating…'
-                : `${generatedCount} generated photo${generatedCount === 1 ? '' : 's'}`}
-            </span>
+            {headshot.status === HeadshotStatus.PROCESSING ? (
+              <Loader2 className="w-5 h-5 animate-spin text-foreground" />
+            ) : (
+              <span>
+                {generatedCount} generated photo
+                {generatedCount === 1 ? '' : 's'}
+              </span>
+            )}
             {headshot.failureReason && (
               <>
                 <span className="hidden sm:inline">•</span>
