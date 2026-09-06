@@ -1,13 +1,13 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/toast';
 import { useDeleteHeadshot } from '@/lib/hooks/useHeadshot';
-import { IHeadshot, HeadshotStatus } from '@/lib/types/headshot';
+import { HeadshotStatus, IHeadshot } from '@/lib/types/headshot';
 import { getApiErrorMessage } from '@/lib/utils';
 import { Camera, Loader2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { toast } from '@/components/ui/toast';
 import { HeadshotStatusBadge } from './headshot-status';
 
 type HeadshotCardProps = {
@@ -32,9 +32,7 @@ export function HeadshotCard({ headshot, onDeleted }: HeadshotCardProps) {
 
   const generatedCount = headshot.generatedHeadshots?.length ?? 0;
 
-  function handleDelete(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
+  function handleDelete() {
     if (
       !window.confirm(
         'Are you sure you want to delete this headshot? This cannot be undone.',
@@ -56,10 +54,7 @@ export function HeadshotCard({ headshot, onDeleted }: HeadshotCardProps) {
         toast.add({
           type: 'error',
           title: 'Delete failed',
-          description: getApiErrorMessage(
-            error,
-            'Failed to delete headshot',
-          ),
+          description: getApiErrorMessage(error, 'Failed to delete headshot'),
         });
       },
     });
@@ -118,8 +113,7 @@ export function HeadshotCard({ headshot, onDeleted }: HeadshotCardProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={(e) => {
-            e.preventDefault();
+          onClick={() => {
             router.push(detailHref);
           }}
         >

@@ -3,12 +3,9 @@
 import { LoadingFallback } from '@/components/loading';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/toast';
-import {
-  useDeleteHeadshot,
-  useGetHeadshotById,
-} from '@/lib/hooks/useHeadshot';
-import { IHeadshot, HeadshotStatus } from '@/lib/types/headshot';
+import { useDeleteHeadshot, useGetHeadshotById } from '@/lib/hooks/useHeadshot';
 import { headshotService } from '@/lib/services/headshot.service';
+import { HeadshotStatus, IHeadshot } from '@/lib/types/headshot';
 import { getApiErrorMessage } from '@/lib/utils';
 import { Download, Loader2, Trash2, X } from 'lucide-react';
 import { HeadshotStatusBadge } from './headshot-status';
@@ -29,8 +26,7 @@ export function HeadshotDetails({
   onDeleted,
 }: HeadshotDetailsProps) {
   const { data, isLoading, error } = useGetHeadshotById(headshotId);
-  const { mutate: deleteHeadshot, isPending: isDeleting } =
-    useDeleteHeadshot();
+  const { mutate: deleteHeadshot, isPending: isDeleting } = useDeleteHeadshot();
 
   if (isLoading) {
     return (
@@ -61,18 +57,14 @@ export function HeadshotDetails({
   const generated = headshot.generatedHeadshots ?? [];
 
   function handleDownload(url: string, filename: string) {
-    headshotService
-      .downloadHeadshot(url, filename)
-      .catch((err) => {
-        toast.add({
-          type: 'error',
-          title: 'Download failed',
-          description:
-            err instanceof Error
-              ? err.message
-              : 'Could not download the image.',
-        });
+    headshotService.downloadHeadshot(url, filename).catch((err) => {
+      toast.add({
+        type: 'error',
+        title: 'Download failed',
+        description:
+          err instanceof Error ? err.message : 'Could not download the image.',
       });
+    });
   }
 
   function handleDelete() {
@@ -97,10 +89,7 @@ export function HeadshotDetails({
         toast.add({
           type: 'error',
           title: 'Delete failed',
-          description: getApiErrorMessage(
-            err,
-            'Failed to delete headshot',
-          ),
+          description: getApiErrorMessage(err, 'Failed to delete headshot'),
         });
       },
     });
@@ -143,12 +132,11 @@ export function HeadshotDetails({
       </div>
 
       {/* Failure reason */}
-      {headshot.status === HeadshotStatus.FAILED &&
-        headshot.failureReason && (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-            {headshot.failureReason}
-          </div>
-        )}
+      {headshot.status === HeadshotStatus.FAILED && headshot.failureReason && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+          {headshot.failureReason}
+        </div>
+      )}
 
       {/* Original photo */}
       <section className="space-y-3">
@@ -195,8 +183,8 @@ export function HeadshotDetails({
         {headshot.status === HeadshotStatus.PROCESSING ? (
           <div className="flex items-center gap-2 rounded-lg border border-dashed border-border bg-muted/50 p-6 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Generation in progress. Generated photos will appear once
-            processing finishes.
+            Generation in progress. Generated photos will appear once processing
+            finishes.
           </div>
         ) : generated.length === 0 ? (
           <p className="text-sm text-muted-foreground">
@@ -233,7 +221,7 @@ export function HeadshotDetails({
                       onClick={() =>
                         handleDownload(
                           g.url,
-                          `headshot-${safeFilename(headshot._id)}-${safeFilename(g.style)}.jpg`,
+                          `headshot-${safeFilename(headshot._id)}-${safeFilename(g.style)}.png`,
                         )
                       }
                       aria-label={`Download ${g.style}`}

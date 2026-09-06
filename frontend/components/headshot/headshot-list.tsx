@@ -6,6 +6,7 @@ import { useGetHeadshots } from '@/lib/hooks/useHeadshot';
 import { Camera, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { HeadshotCard } from './headshot-card';
+import { useRouter } from 'next/navigation';
 
 type HeadshotListProps = {
   onDeleted?: (id: string) => void;
@@ -13,6 +14,7 @@ type HeadshotListProps = {
 
 export function HeadshotList({ onDeleted }: HeadshotListProps) {
   const { data, isLoading, error } = useGetHeadshots();
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -53,9 +55,7 @@ export function HeadshotList({ onDeleted }: HeadshotListProps) {
         </p>
         <Button
           className="mt-4"
-          render={
-            <Link href="/dashboard/user/headshots/studio" />
-          }
+          onClick={() => router.push('/dashboard/user/headshots/studio')}
         >
           <Sparkles className="h-4 w-4" />
           Open Studio
