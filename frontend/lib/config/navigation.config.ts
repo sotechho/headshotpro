@@ -1,4 +1,5 @@
 import {
+  CameraIcon,
   CreditCard,
   LayoutDashboard,
   LucideIcon,
@@ -19,6 +20,11 @@ export interface NavigationConfig {
 
 export const userNavigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/dashboard/user', icon: LayoutDashboard },
+  {
+    name: 'Headshot Studio',
+    href: '/dashboard/user/headshots',
+    icon: CameraIcon,
+  },
   { name: 'Credits', href: '/dashboard/user/credits', icon: CreditCard },
   { name: 'Orders', href: '/dashboard/user/orders', icon: Receipt },
   { name: 'Setting', href: '/dashboard/user/setting', icon: Settings },
