@@ -9,7 +9,7 @@ const { region, accessKeyId, accessSecretKey } = config.aws;
 if (!region || !accessKeyId || !accessSecretKey) {
   logger.error('AWS S3 credentials are not configured');
 
-  throw new ExternalServiceError('AWS S3 configuration is incomplete', 's3');
+  throw new ExternalServiceError('File upload failed connection error', 's3');
 }
 
 const s3Client = new S3Client({
