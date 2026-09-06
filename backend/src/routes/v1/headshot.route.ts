@@ -14,5 +14,6 @@ router.post(
 );
 router.get('/', headshotController.getHeadshots);
 router.get('/:id', headshotController.getHeadshotById);
+router.delete('/:id', headshotController.deleteHeadshot);
 
 export default router;

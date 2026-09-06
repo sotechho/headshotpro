@@ -62,6 +62,26 @@ class HeadshotService {
     return headshot;
   }
 
+  async deleteHeadshot(userId: string, id: string): Promise<void> {
+    const headshot = await this.getHeadshotById(userId, id);
+
+    const keys = [
+      headshot.originalPhotoKey,
+      ...headshot.generatedHeadshots.map((generated) => generated.key),
+    ].filter((key): key is string => Boolean(key?.trim()));
+
+    if (keys.length > 0) {
+      await s3Service.deleteFiles(keys);
+    }
+
+    await headshot.deleteOne();
+    logger.info('Deleted headshot from db and s3', {
+      userId,
+      headshotId: id,
+      deletedKeys: keys,
+    });
+  }
+
   async generateHeadshot(params: GenerateHeadshotParams): Promise<IHeadshot> {
     const { userId, selectedStyles, customPrompt, fileBuffer, fileExtension } =
       params;

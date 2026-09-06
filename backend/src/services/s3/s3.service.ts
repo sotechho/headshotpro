@@ -1,9 +1,17 @@
 import { config } from '@/config';
 import s3Client from '@/lib/s3.client';
 import type { UploadFileResponse } from '@/types/s3.types';
-import { ExternalServiceError } from '@/utils/errors';
+import {
+  AppError,
+  BadRequestError,
+  ExternalServiceError,
+} from '@/utils/errors';
 import logger from '@/utils/logger';
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl as getSignedUrlPresigner } from '@aws-sdk/s3-request-presigner';
 import crypto from 'crypto';
 
@@ -84,6 +92,31 @@ class S3Service {
       logger.error('Signed Url failed aws s3', { ...error, key });
       throw new ExternalServiceError('Failed to generate signed url', 's3');
     }
+  }
+
+  async deleteFile(key: string): Promise<void> {
+    try {
+      if (!key.trim()) {
+        logger.error('Invalid s3 key provided');
+        throw new BadRequestError('Invalid key provided');
+      }
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+      });
+      await s3Client.send(command);
+    } catch (error) {
+      logger.error('Failed to delete s3 file', { error });
+      throw new AppError(
+        500,
+        'S3_DELETE_OBJECT_ERROR',
+        'Unable to delete object',
+      );
+    }
+  }
+
+  async deleteFiles(keys: string[]): Promise<void> {
+    await Promise.all(keys.map(async (key) => await this.deleteFile(key)));
   }
 }
 

@@ -4,6 +4,7 @@ import { BadRequestError, UnauthorizedError } from '@/utils/errors';
 import logger from '@/utils/logger';
 import {
   createdResponse,
+  noContentResponse,
   successResponse
 } from '@/utils/responses';
 import type { Request, Response } from 'express';
@@ -138,4 +139,19 @@ export async function getHeadshotById(req: Request, res: Response) {
       ),
     ),
   });
+}
+
+export async function deleteHeadshot(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new UnauthorizedError('User not authenticated');
+  }
+
+  const { id } = req.params;
+  if (typeof id !== 'string') {
+    throw new BadRequestError('Invalid headshot id');
+  }
+
+  await headshotService.deleteHeadshot(userId, id);
+  return noContentResponse(res);
 }
