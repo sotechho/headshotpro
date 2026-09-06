@@ -14,6 +14,7 @@ if (!region || !accessKeyId || !accessSecretKey) {
 
 const s3Client = new S3Client({
   region,
+  endpoint: 'https://sgp1.digitaloceanspaces.com',
   credentials: {
     accessKeyId,
     secretAccessKey: accessSecretKey,

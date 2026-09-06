@@ -127,7 +127,7 @@ export async function getHeadshotById(req: Request, res: Response) {
       headshot.originalPhotoKey,
       oneDay,
     ),
-    generatedHeadshots: Promise.all(
+    generatedHeadshots: await Promise.all(
       headshot.generatedHeadshots.map(
         async (generatedHeadshot: Record<any, any>) => ({
           ...generatedHeadshot,
