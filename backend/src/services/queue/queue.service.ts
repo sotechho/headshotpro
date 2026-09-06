@@ -2,7 +2,6 @@ import { inngest } from '@/lib/inngest.client';
 import type { ISuccessfullPayment } from '@/types/payment.types';
 import { AppError } from '@/utils/errors';
 import logger from '@/utils/logger';
-import { addUserCredits } from './payment.queue';
 import type { HeadshotStyle } from '../headshot';
 
 export interface IAddCreditEventData extends ISuccessfullPayment {
@@ -49,4 +48,3 @@ export async function triggerGenerateHeadshots(data:IGenerateHeadshotEventData){
   }
 }
 
-export const inngestFunctions = [addUserCredits()];
