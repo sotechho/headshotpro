@@ -1,7 +1,11 @@
 import { headshotService } from '@/services/headshot';
+import { s3Service } from '@/services/s3';
 import { BadRequestError, UnauthorizedError } from '@/utils/errors';
 import logger from '@/utils/logger';
-import { createdResponse, successResponse } from '@/utils/responses';
+import {
+  createdResponse,
+  successResponse
+} from '@/utils/responses';
 import type { Request, Response } from 'express';
 
 export async function getAvailableStyles(req: Request, res: Response) {
@@ -73,4 +77,65 @@ export async function generateHeadshot(req: Request, res: Response) {
     'Triggered headshot generation it takes some minutes',
     headshot,
   );
+}
+
+export async function getHeadshots(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new UnauthorizedError('User not authenticated');
+  }
+
+  const limit = Math.max(1, Number(req.query.limit) || 10);
+  const offset = Math.max(0, Number(req.query.offset) || 0);
+  const { headshots, total } = await headshotService.getHeadshots(
+    userId,
+    limit,
+    offset,
+  );
+
+  return successResponse(res, 'Headshots fetched', 200, {
+    headshots,
+    pagination: {
+      page: Math.floor(offset / limit) + 1,
+      limit,
+      total,
+    },
+  });
+}
+
+export async function getHeadshotById(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new UnauthorizedError('User not authenticated');
+  }
+
+  const { id } = req.params;
+  if (typeof id !== 'string') {
+    throw new BadRequestError('Invalid headshot id');
+  }
+
+  const headshot = (
+    await headshotService.getHeadshotById(userId, id)
+  ).toObject();
+  
+  const oneDay = 24 * 60 * 60;
+
+  return successResponse(res, 'Headshot fetched', 200, {
+    ...headshot,
+    originalPhotoUrl: await s3Service.getSignedUrl(
+      headshot.originalPhotoKey,
+      oneDay,
+    ),
+    generatedHeadshots: Promise.all(
+      headshot.generatedHeadshots.map(
+        async (generatedHeadshot: Record<any, any>) => ({
+          ...generatedHeadshot,
+          originalPhotoUrl: await s3Service.getSignedUrl(
+            generatedHeadshot.originalPhotoKey,
+            oneDay,
+          ),
+        }),
+      ),
+    ),
+  });
 }

@@ -12,5 +12,7 @@ router.post(
   upload.single('photo'),
   headshotController.generateHeadshot,
 );
+router.get('/', headshotController.getHeadshots);
+router.get('/:id', headshotController.getHeadshotById);
 
 export default router;

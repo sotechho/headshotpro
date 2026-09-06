@@ -4,10 +4,12 @@ import { Headshot, type IHeadshot } from '@/models/Headshot.modal';
 import { s3Service } from '@/services/s3';
 import {
   AppError,
+  BadRequestError,
   InsufficientCreditError,
   NotFoundError,
 } from '@/utils/errors';
 import logger from '@/utils/logger';
+import mongoose from 'mongoose';
 import { triggerGenerateHeadshots } from '../queue';
 
 export type HeadshotStyle = keyof typeof HEADSHOT_STYLES;
@@ -29,6 +31,35 @@ class HeadshotService {
       }),
     );
     return styles;
+  }
+
+  async getHeadshots(
+    userId: string,
+    limit: number,
+    offset: number,
+  ): Promise<{ headshots: IHeadshot[]; total: number }> {
+    const [headshots, total] = await Promise.all([
+      Headshot.find({ user: userId })
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit),
+      Headshot.countDocuments({ user: userId }),
+    ]);
+
+    return { headshots, total };
+  }
+
+  async getHeadshotById(userId: string, id: string): Promise<IHeadshot> {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestError('Invalid headshot id');
+    }
+
+    const headshot = await Headshot.findOne({ _id: id, user: userId });
+    if (!headshot) {
+      throw new NotFoundError('Headshot not found');
+    }
+
+    return headshot;
   }
 
   async generateHeadshot(params: GenerateHeadshotParams): Promise<IHeadshot> {
