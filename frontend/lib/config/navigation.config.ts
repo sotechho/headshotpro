@@ -21,7 +21,7 @@ export interface NavigationConfig {
 export const userNavigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/dashboard/user', icon: LayoutDashboard },
   {
-    name: 'Headshot Studio',
+    name: 'Headshots',
     href: '/dashboard/user/headshots',
     icon: CameraIcon,
   },
