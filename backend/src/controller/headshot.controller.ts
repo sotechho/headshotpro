@@ -17,11 +17,24 @@ export async function getAvailableStyles(req: Request, res: Response) {
 export async function generateHeadshot(req: Request, res: Response) {
   const userId = req.user?.userId;
   const {
-    selectedStyles,
+    selectedStyles: styles,
     customPrompt,
-  }: { selectedStyles?: string[]; customPrompt?: string } = req.body;
+  }: { selectedStyles?: string; customPrompt?: string } = req.body;
   if (!userId) {
     throw new UnauthorizedError('User not authenticated');
+  }
+
+  let selectedStyles: string[] | undefined = undefined;
+
+  if (styles) {
+    try {
+      selectedStyles = JSON.parse(styles);
+    } catch (error) {
+      logger.error('Failed to parse selected styles json', {
+        error,
+      });
+      throw new BadRequestError('Invalid style unable to process');
+    }
   }
 
   logger.info(`Generating headshot for user ${userId}`);
@@ -34,7 +47,7 @@ export async function generateHeadshot(req: Request, res: Response) {
     throw new BadRequestError('File is required');
   }
 
-  if (!selectedStyles && !customPrompt) {
+  if ((!selectedStyles || selectedStyles.length === 0) && !customPrompt) {
     logger.error('Either styles or custom prompt is required', {
       userId,
     });
