@@ -56,8 +56,8 @@ export function HeadshotDetails({
   const headshot: IHeadshot = data;
   const generated = headshot.generatedHeadshots ?? [];
 
-  function handleDownload(url: string, filename: string) {
-    headshotService.downloadHeadshot(url, filename).catch((err) => {
+  function handleDownload(url: string) {
+    headshotService.downloadHeadshot(url).catch((err) => {
       toast.add({
         type: 'error',
         title: 'Download failed',
@@ -149,10 +149,7 @@ export function HeadshotDetails({
               variant="outline"
               size="sm"
               onClick={() =>
-                handleDownload(
-                  headshot.originalPhotoUrl as string,
-                  `headshot-${safeFilename(headshot._id)}-original.jpg`,
-                )
+                handleDownload(headshot.originalPhotoUrl as string)
               }
             >
               <Download className="h-4 w-4" />
@@ -218,12 +215,7 @@ export function HeadshotDetails({
                     <Button
                       variant="outline"
                       size="icon-sm"
-                      onClick={() =>
-                        handleDownload(
-                          g.url,
-                          `headshot-${safeFilename(headshot._id)}-${safeFilename(g.style)}.png`,
-                        )
-                      }
+                      onClick={() => handleDownload(g.url)}
                       aria-label={`Download ${g.style}`}
                     >
                       <Download className="h-4 w-4" />
