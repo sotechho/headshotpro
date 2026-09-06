@@ -5,7 +5,7 @@ import logger from '@/utils/logger';
 import {
   createdResponse,
   noContentResponse,
-  successResponse
+  successResponse,
 } from '@/utils/responses';
 import type { Request, Response } from 'express';
 
@@ -118,7 +118,7 @@ export async function getHeadshotById(req: Request, res: Response) {
   const headshot = (
     await headshotService.getHeadshotById(userId, id)
   ).toObject();
-  
+
   const oneDay = 24 * 60 * 60;
 
   return successResponse(res, 'Headshot fetched', 200, {
@@ -131,10 +131,7 @@ export async function getHeadshotById(req: Request, res: Response) {
       headshot.generatedHeadshots.map(
         async (generatedHeadshot: Record<any, any>) => ({
           ...generatedHeadshot,
-          originalPhotoUrl: await s3Service.getSignedUrl(
-            generatedHeadshot.originalPhotoKey,
-            oneDay,
-          ),
+          url: await s3Service.getSignedUrl(generatedHeadshot.key, oneDay),
         }),
       ),
     ),
