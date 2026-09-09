@@ -17,6 +17,13 @@ export function errorHandler(
   if (err instanceof AppError) {
     const errors =
       err instanceof ValidationError ? err.validationErrors : undefined;
+    if (errors) {
+      logger.error('Request validation failed', {
+        method: req.method,
+        path: req.originalUrl,
+        errors,
+      });
+    }
     return errorResponse(res, err.statusCode, err.message, errors);
   }
 

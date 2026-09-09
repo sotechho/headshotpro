@@ -1,6 +1,10 @@
 import { User } from '@/models/User.model';
 import { tokenService } from '@/services/auth/token.service';
-import { NotFoundError, UnauthorizedError } from '@/utils/errors';
+import {
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} from '@/utils/errors';
 import type { NextFunction, Request, Response } from 'express';
 
 declare global {
@@ -58,4 +62,18 @@ export async function authenticate(
   } catch (error) {
     next(error);
   }
+}
+
+export function authorize(...roles: string[]) {
+  return function (req: Request, _res: Response, next: NextFunction) {
+    if (!req.user) {
+      throw new UnauthorizedError('Unauthorized user');
+    }
+
+    if (!roles.includes(req.user.role)) {
+      throw new ForbiddenError();
+    }
+
+    next();
+  };
 }
