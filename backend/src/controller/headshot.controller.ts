@@ -100,6 +100,7 @@ export async function getHeadshots(req: Request, res: Response) {
       page: Math.floor(offset / limit) + 1,
       limit,
       total,
+      totalPages: Math.ceil(total / limit),
     },
   });
 }
