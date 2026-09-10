@@ -5,6 +5,7 @@ import { successResponse } from '@/utils/responses';
 import type {
   AdminOrdersQuery,
   AdminUsersQuery,
+  UpdateOrderStatusInput,
   UpdateUserInput,
 } from '@/validators/admin.user.validator';
 import type { Request, Response } from 'express';
@@ -84,4 +85,28 @@ export async function getAllOrders(req: Request, res: Response) {
       totalPages: Math.ceil(total / limit),
     },
   });
+}
+
+export async function updateOrderStatus(req: Request, res: Response) {
+  const { id } = req.params;
+  const { status } = req.body as UpdateOrderStatusInput;
+
+  const order = await Order.findByIdAndUpdate(
+    id,
+    { status },
+    { new: true, runValidators: true },
+  ).populate([
+    {
+      path: 'user',
+      select:
+        '-password -refreshToken -emailVerificationToken -emailVerificationTokenExpires',
+    },
+    { path: 'package' },
+  ]);
+
+  if (!order) {
+    throw new NotFoundError('Order not found');
+  }
+
+  return successResponse(res, 'Order status updated', 200, order);
 }

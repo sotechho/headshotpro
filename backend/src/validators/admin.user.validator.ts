@@ -12,6 +12,10 @@ export const userIdParamsSchema = z.object({
   id: objectIdSchema,
 });
 
+export const orderIdParamsSchema = z.object({
+  id: objectIdSchema,
+});
+
 export const updateUserSchema = z
   .object({
     username: z.string().trim().min(1).optional(),
@@ -30,6 +34,12 @@ export const adminOrdersQuerySchema = z.object({
   status: z.enum(Object.values(PaymentStatus)).optional(),
 });
 
+export const updateOrderStatusSchema = z
+  .object({
+    status: z.enum(Object.values(PaymentStatus)),
+  })
+  .strict();
+
 export const adminUsersQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
@@ -38,3 +48,4 @@ export const adminUsersQuerySchema = z.object({
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type AdminOrdersQuery = z.infer<typeof adminOrdersQuerySchema>;
 export type AdminUsersQuery = z.infer<typeof adminUsersQuerySchema>;
+export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;

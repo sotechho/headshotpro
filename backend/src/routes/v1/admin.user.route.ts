@@ -8,6 +8,8 @@ import {
 import {
   adminOrdersQuerySchema,
   adminUsersQuerySchema,
+  orderIdParamsSchema,
+  updateOrderStatusSchema,
   updateUserSchema,
   userIdParamsSchema,
 } from '@/validators/admin.user.validator';
@@ -32,6 +34,12 @@ router.get(
   '/orders',
   validateQuery(adminOrdersQuerySchema),
   adminUserController.getAllOrders,
+);
+router.patch(
+  '/orders/:id',
+  validateParams(orderIdParamsSchema),
+  validateRequest(updateOrderStatusSchema),
+  adminUserController.updateOrderStatus,
 );
 
 export default router;
