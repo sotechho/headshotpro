@@ -1,3 +1,4 @@
+import { IHeadshotStyleInfo } from '@/lib/types/headshot';
 import { Check } from 'lucide-react';
 
 type StyleSelectorProps = {
