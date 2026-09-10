@@ -47,7 +47,14 @@ class PaymentService {
       .limit(limit)
       .sort({ createdAt: -1 })
       .select('-paymentDetails')
-      .populate(['package', 'user']);
+      .populate([
+        'package',
+        {
+          path: 'user',
+          select:
+            '-password -refreshToken -emailVerificationToken -emailVerificationTokenExpires',
+        },
+      ]);
 
     return orders;
   }
