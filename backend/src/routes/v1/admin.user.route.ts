@@ -8,6 +8,7 @@ import {
 import {
   adminOrdersQuerySchema,
   adminUsersQuerySchema,
+  createManualOrderScheam,
   orderIdParamsSchema,
   updateOrderStatusSchema,
   updateUserSchema,
@@ -40,6 +41,11 @@ router.patch(
   validateParams(orderIdParamsSchema),
   validateRequest(updateOrderStatusSchema),
   adminUserController.updateOrderStatus,
+);
+router.post(
+  '/orders/manual/create',
+  validateRequest(createManualOrderScheam),
+  adminUserController.createManualOrder,
 );
 
 export default router;

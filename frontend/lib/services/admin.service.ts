@@ -26,6 +26,8 @@ export const adminService = {
     ),
   updateOrderStatus: async (payload: { status: PaymentStatus }, id: string) =>
     api.patch<IOrder>(`/admin/orders/${id}`, payload),
+  createManualOrder: async (payload: { userId: string; packageId: string }) =>
+    api.post('/admin/orders/manual/create', payload),
   updateUser: async (
     payload: Partial<Omit<User, 'id' | 'email' | 'emailVerified'>>,
     id: string,

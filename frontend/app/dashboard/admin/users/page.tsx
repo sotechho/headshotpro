@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import { MoreHorizontalIcon } from 'lucide-react';
+import { useState } from 'react';
 
+import { CreateOrderDialog } from '@/components/admin/users/create-order';
+import { EditUserDialog } from '@/components/admin/users/edit-user';
+import { LoadingFallback } from '@/components/loading';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,6 +15,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import {
   Table,
   TableBody,
@@ -21,23 +34,13 @@ import {
 } from '@/components/ui/table';
 import { useGetAdminUsers } from '@/lib/hooks';
 import { User } from '@/lib/types/auth';
-import { LoadingFallback } from '@/components/loading';
-import { EditUserDialog } from '@/components/admin/users/edit-user';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
-import { Badge } from '@/components/ui/badge';
 
 export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [orderUser, setOrderUser] = useState<User | null>(null);
   const { data, isLoading, isFetching } = useGetAdminUsers(10, page);
+
   const users = data?.users;
   const pagination = data?.pagination;
 
@@ -113,8 +116,8 @@ export default function UsersPage() {
                         Edit user
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setSelectedUser(user)}>
-                        Manage credits
+                      <DropdownMenuItem onClick={() => setOrderUser(user)}>
+                        Create order
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -209,6 +212,13 @@ export default function UsersPage() {
         open={selectedUser !== null}
         onOpenChange={(open) => {
           if (!open) setSelectedUser(null);
+        }}
+      />
+      <CreateOrderDialog
+        user={orderUser}
+        open={orderUser !== null}
+        onOpenChange={(open) => {
+          if (!open) setOrderUser(null);
         }}
       />
     </div>

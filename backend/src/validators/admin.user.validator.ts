@@ -45,7 +45,13 @@ export const adminUsersQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
+export const createManualOrderScheam = z.object({
+  userId: objectIdSchema,
+  packageId: objectIdSchema,
+});
+
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type AdminOrdersQuery = z.infer<typeof adminOrdersQuerySchema>;
 export type AdminUsersQuery = z.infer<typeof adminUsersQuerySchema>;
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;
+export type CreateManualOrderInput = z.infer<typeof createManualOrderScheam>;

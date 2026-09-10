@@ -47,6 +47,20 @@ export function useUpdateOrderStatus() {
   });
 }
 
+export function useCreateManualOrder() {
+  const invalidateOrders = useInvalidateAdminOrders();
+  const invalidateUsers = useInvalidateAdminUsers();
+
+  return useMutation({
+    mutationFn: (payload: { userId: string; packageId: string }) =>
+      adminService.createManualOrder(payload),
+    onSuccess: () => {
+      invalidateOrders();
+      invalidateUsers();
+    },
+  });
+}
+
 function useInvalidateAdminUsers() {
   const queryClient = useQueryClient();
 
