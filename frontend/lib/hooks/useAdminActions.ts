@@ -31,6 +31,22 @@ export function useGetAdminOrders(
   });
 }
 
+function useInvalidateAdminOrders() {
+  const queryClient = useQueryClient();
+
+  return () => queryClient.invalidateQueries({ queryKey: adminKeys.orders() });
+}
+
+export function useUpdateOrderStatus() {
+  const invalidateOrders = useInvalidateAdminOrders();
+
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: PaymentStatus }) =>
+      adminService.updateOrderStatus({ status }, id),
+    onSuccess: invalidateOrders,
+  });
+}
+
 function useInvalidateAdminUsers() {
   const queryClient = useQueryClient();
 

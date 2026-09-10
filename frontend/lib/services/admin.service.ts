@@ -15,9 +15,7 @@ export interface AdminOrdersResponse {
 
 export const adminService = {
   getUsers: async (limit: number = 10, page: number = 1) =>
-    api.get<AdminUsersResponse>(
-      `/admin/users?page=${page}&limit=${limit}`,
-    ),
+    api.get<AdminUsersResponse>(`/admin/users?page=${page}&limit=${limit}`),
   getOrders: async (
     limit: number = 10,
     page: number = 1,
@@ -26,6 +24,8 @@ export const adminService = {
     api.get<AdminOrdersResponse>(
       `/admin/orders?page=${page}&limit=${limit}${status ? `&status=${status}` : ''}`,
     ),
+  updateOrderStatus: async (payload: { status: PaymentStatus }, id: string) =>
+    api.patch<IOrder>(`/admin/orders/${id}`, payload),
   updateUser: async (
     payload: Partial<Omit<User, 'id' | 'email' | 'emailVerified'>>,
     id: string,
