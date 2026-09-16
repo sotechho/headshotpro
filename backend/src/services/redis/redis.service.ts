@@ -4,7 +4,7 @@ import Redis from 'ioredis';
 
 class RedisService {
   private client: Redis | null = null;
-  
+
   constructor() {
     if (!config.redisUrl) {
       logger.warn('Redis credentials missing');
@@ -73,6 +73,23 @@ class RedisService {
     } catch (error) {
       logger.error('Failed to delete', { error, key });
     }
+  }
+
+  async ttl(key: string): Promise<number> {
+    try {
+      if (!this.client) {
+        logger.warn('Redis connection failed');
+        return 0;
+      }
+      return await this.client.ttl(key);
+    } catch (error) {
+      logger.error('Failed to delete', { error, key });
+      return 0;
+    }
+  }
+
+  isConnected(): boolean {
+    return !!this.client;
   }
 }
 
