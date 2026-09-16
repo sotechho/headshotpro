@@ -1,5 +1,5 @@
 import { authController } from '@/controller';
-import { authenticate } from '@/middlewares';
+import { authenticate, rateLimit } from '@/middlewares';
 import {
   validateQuery,
   validateRequest,
@@ -16,6 +16,7 @@ const router = Router();
 
 router.post(
   '/register',
+  rateLimit.auth.register,
   validateRequest(registerSchema),
   authController.register,
 );
@@ -26,10 +27,16 @@ router.get(
 );
 router.post(
   '/resend-verification',
+  rateLimit.auth.resendVerification,
   validateRequest(resendVerificationSchema),
   authController.resendVerificationEmail,
 );
-router.post('/login', validateRequest(loginSchema), authController.login);
+router.post(
+  '/login',
+  rateLimit.auth.login,
+  validateRequest(loginSchema),
+  authController.login,
+);
 
 router.get('/me', authenticate, authController.getCurrentUser);
 router.post('/refresh-token', authController.refreshToken);

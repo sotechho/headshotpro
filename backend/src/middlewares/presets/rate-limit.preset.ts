@@ -1,6 +1,6 @@
-import { rateLimitMiddleware } from "../rate-limit.middleware";
+import { rateLimitMiddleware } from '../rate-limit.middleware';
 
-export const rateLmit = {
+export const rateLimit = {
   general: rateLimitMiddleware({
     identifierType: 'ip',
     keyPrefix: 'general:api',
@@ -19,6 +19,12 @@ export const rateLmit = {
       keyPrefix: 'auth:register',
       maxRequest: 5,
       windowSeconds: 5 * 60,
+    }),
+    resendVerification: rateLimitMiddleware({
+      identifierType: 'email',
+      keyPrefix: 'auth:resend',
+      maxRequest: 5,
+      windowSeconds: 15 * 60,
     }),
   },
 };
