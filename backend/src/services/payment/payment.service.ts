@@ -18,10 +18,22 @@ import mongoose from 'mongoose';
 import { stripeService } from './stripe.service';
 import { triggerAddUserCredits } from '../queue';
 import { mobileWalletService } from './mwallet.service';
+import { redisCacheService } from '../redis';
 
 class PaymentService {
   async getCreditPackages(): Promise<ICreditPackage[]> {
+    const key = 'payment:credits';
+    const ttl = 24 * 60 * 60;
+    const cachedData = await redisCacheService.get<ICreditPackage[]>(key);
+
+    if (cachedData) {
+      logger.info('Cache hit', { key });
+      return cachedData;
+    }
     const credits = await CreditPackage.find({ isActive: true });
+    await redisCacheService.set<ICreditPackage[]>(key, credits, ttl);
+    logger.info('Cache miss', { key, cachedAt: new Date().toISOString() });
+
     return credits;
   }
 
