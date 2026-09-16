@@ -91,6 +91,31 @@ class RedisService {
   isConnected(): boolean {
     return !!this.client;
   }
+
+  async getAllMatchingKeys(pattern: string): Promise<string[]> {
+    try {
+      if (!this.client) {
+        logger.warn('Redis connection failed');
+        return [];
+      }
+
+      const keys: string[] = [];
+
+      const stream = this.client.scanStream({
+        match: pattern,
+        count: 100,
+      });
+
+      for await (const chunkOfKeys of stream) {
+        keys.push(...chunkOfKeys);
+      }
+
+      return keys;
+    } catch (error) {
+      logger.error('Failed to find matched keys', { error, pattern });
+      return [];
+    }
+  }
 }
 
 export const redisService = new RedisService();
