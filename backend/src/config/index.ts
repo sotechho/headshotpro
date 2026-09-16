@@ -104,4 +104,5 @@ export const config = {
     apiKey: process.env.REPLICATE_API_KEY || '',
   },
   aiProvider: process.env.AI_PROVIDER || AI_PROVIDERS.REPLICATE,
+  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
 };
