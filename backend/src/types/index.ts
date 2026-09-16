@@ -14,3 +14,9 @@ export interface GenerateAccessAndRefreshToken {
 export interface LoginServiceResponse extends GenerateAccessAndRefreshToken {
   user: IUser;
 }
+
+export interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetAt: Date;
+}
