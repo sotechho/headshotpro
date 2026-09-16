@@ -20,3 +20,11 @@ export interface RateLimitResult {
   remaining: number;
   resetAt: Date;
 }
+
+export interface RateLimitConfig {
+  maxRequest: number;
+  windowSeconds: number;
+  identifierType: 'ip' | 'email';
+  keyPrefix: string;
+  message?: string;
+}

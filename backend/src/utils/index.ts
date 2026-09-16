@@ -1,5 +1,6 @@
 import axios from 'axios';
 export * from './headshot.helper';
+export * from './rate-limit.util';
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
