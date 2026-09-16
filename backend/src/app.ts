@@ -7,16 +7,32 @@ import express, { type Request, type Response } from 'express';
 import { paymentController } from './controller';
 import { errorHandler } from './middlewares/error.middleware';
 import inngestRoute from './routes/inngest.route';
+import helmet from 'helmet';
+import compression from 'compression';
 
 const app = express();
 
-app.post(
-  '/api/v1/webhooks/stripe',
-  express.raw({ type: 'application/json' }),
-  paymentController.stripeWebhookHandler,
-);
-
 // MIDDLEWARES
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"], // Inline styles for Tailwind/CSS frameworks
+        scriptSrc: ["'self'"], // Only your domain (Cloudflare proxies transparently)
+        imgSrc: ["'self'", 'data:', 'https:'], // S3 images + base64
+        fontSrc: ["'self'", 'data:'], // Your fonts (Cloudflare caches them)
+        frameSrc: ["'self'"], // No external iframes
+        objectSrc: ["'none'"], // Block plugins
+        upgradeInsecureRequests: [], // Force HTTPS
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Allow S3 images
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow Cloudflare proxy
+  }),
+);
+app.use(compression());
 
 // CORS
 app.use(
@@ -33,8 +49,14 @@ app.use(
   }),
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.post(
+  '/api/v1/webhooks/stripe',
+  express.raw({ type: 'application/json' }),
+  paymentController.stripeWebhookHandler,
+);
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 app.get('/', (_req: Request, res: Response) => {

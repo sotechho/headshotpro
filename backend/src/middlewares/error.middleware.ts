@@ -9,9 +9,15 @@ export function errorHandler(
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) {
-  logger.error(err.message, { err });
+  logger.error(err.stack || err.message, {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+  });
 
   // handle app errors
   if (err instanceof AppError) {
